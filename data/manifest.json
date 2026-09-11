@@ -1,1 +1,138 @@
-[]
+{
+  "SEARA": {
+    "jeonji": {
+      "displayName": "전지",
+      "info": {
+        "창고명": "신우냉장",
+        "품목명": "돈전지 SEARA 1138 SIF490",
+        "재고수량": "969",
+        "중량(kg)": "19,463.73",
+        "BL번호": "HLCUIT1251021138",
+        "유통기한": "2027.10.27",
+        "통관상태": "통관",
+        "촬영일": "2026.09.11"
+      },
+      "photos": [
+        "images/SEARA/jeonji/01.png",
+        "images/SEARA/jeonji/02.png",
+        "images/SEARA/jeonji/03.png",
+        "images/SEARA/jeonji/04.png",
+        "images/SEARA/jeonji/05.png",
+        "images/SEARA/jeonji/06.png",
+        "images/SEARA/jeonji/07.png"
+      ]
+    },
+    "mokppyeo": {
+      "displayName": "목뼈",
+      "info": {
+        "창고명": "신우냉장",
+        "품목명": "돈목뼈 SEARA 0255 SIF490",
+        "재고수량": "1,067",
+        "중량(kg)": "16,005",
+        "BL번호": "MAEUJBS310255",
+        "유통기한": "2028.03.23",
+        "통관상태": "통관",
+        "촬영일": "2026.09.11"
+      },
+      "photos": [
+        "images/SEARA/mokppyeo/01.png",
+        "images/SEARA/mokppyeo/02.png",
+        "images/SEARA/mokppyeo/03.png",
+        "images/SEARA/mokppyeo/04.png",
+        "images/SEARA/mokppyeo/05.png",
+        "images/SEARA/mokppyeo/06.png"
+      ]
+    }
+  },
+  "SEABOARD": {
+    "gabri_jungfood": {
+      "displayName": "가브리 (정푸드 가공)",
+      "info": {
+        "창고명": "신우냉장",
+        "품목명": "작업가부리 SEABOARD 0952 (정푸드)",
+        "재고수량": "90",
+        "중량(kg)": "1,135.4",
+        "BL번호": "이력903009700952",
+        "유통기한": "2028.02.03",
+        "통관상태": "통관",
+        "촬영일": "2026.09.11"
+      },
+      "photos": [
+        "images/SEABOARD/gabri_jungfood/01.png",
+        "images/SEABOARD/gabri_jungfood/02.png",
+        "images/SEABOARD/gabri_jungfood/03.png",
+        "images/SEABOARD/gabri_jungfood/04.png",
+        "images/SEABOARD/gabri_jungfood/05.png"
+      ]
+    },
+    "gabri_random": {
+      "displayName": "가브리 (랜덤)",
+      "info": {
+        "창고명": "신우냉장",
+        "품목명": "돈가부리 SEABOARD 9207 46071",
+        "재고수량": "107",
+        "중량(kg)": "1,480.82",
+        "BL번호": "NAM8539207",
+        "유통기한": "2028.05.12",
+        "통관상태": "통관",
+        "촬영일": "2026.09.11"
+      },
+      "photos": [
+        "images/SEABOARD/gabri_random/01.png",
+        "images/SEABOARD/gabri_random/02.png",
+        "images/SEABOARD/gabri_random/03.png",
+        "images/SEABOARD/gabri_random/04.png",
+        "images/SEABOARD/gabri_random/05.png",
+        "images/SEABOARD/gabri_random/06.png",
+        "images/SEABOARD/gabri_random/07.png"
+      ]
+    }
+  },
+  "AGROSUPER": {
+    "hangjeong": {
+      "displayName": "항정살 (칠레산)",
+      "info": {
+        "창고명": "신우냉장",
+        "품목명": "작업항정살 AGROSUPER 0678(ASSA정푸드)",
+        "재고수량": "245",
+        "중량(kg)": "2,940",
+        "BL번호": "이력912009700678",
+        "유통기한": "2027.10.16",
+        "통관상태": "통관",
+        "촬영일": "2026.09.11"
+      },
+      "photos": [
+        "images/AGROSUPER/hangjeong/01.png",
+        "images/AGROSUPER/hangjeong/02.png",
+        "images/AGROSUPER/hangjeong/03.png",
+        "images/AGROSUPER/hangjeong/04.png",
+        "images/AGROSUPER/hangjeong/05.png",
+        "images/AGROSUPER/hangjeong/06.png"
+      ]
+    },
+    "gabri_11": {
+      "displayName": "가부리 (11쌍)",
+      "info": {
+        "창고명": "신우냉장",
+        "품목명": "돈가부리 AGROSUPER 4211 06-02",
+        "재고수량": "1,348",
+        "중량(kg)": "11,911.63",
+        "BL번호": "SNG0504211",
+        "유통기한": "2028.03.03",
+        "통관상태": "통관",
+        "촬영일": "2026.09.11"
+      },
+      "photos": [
+        "images/AGROSUPER/gabri_11/01.png",
+        "images/AGROSUPER/gabri_11/02.png",
+        "images/AGROSUPER/gabri_11/03.png",
+        "images/AGROSUPER/gabri_11/04.png",
+        "images/AGROSUPER/gabri_11/05.png",
+        "images/AGROSUPER/gabri_11/06.png",
+        "images/AGROSUPER/gabri_11/07.png",
+        "images/AGROSUPER/gabri_11/08.png",
+        "images/AGROSUPER/gabri_11/09.png"
+      ]
+    }
+  }
+}

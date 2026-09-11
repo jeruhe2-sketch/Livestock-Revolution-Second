@@ -4,17 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>축산 라이브러리</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jetbrains-mono/2.304/web/woff2/JetBrainsMono.min.css" onerror="this.remove()">
 <style>
   :root{
     --bg: #EFF3F1;
     --ink: #16201C;
     --sub: #5C6B64;
     --line: #D3DCD7;
-    --accent: #A8431F;   /* 저장육 색조 */
-    --cold: #33586B;     /* 냉장 느낌의 차가운 청록 */
+    --accent: #A8431F;
+    --cold: #33586B;
     --card: #FFFFFF;
   }
   *{box-sizing:border-box;}
@@ -25,283 +23,198 @@
     font-family:'Pretendard', -apple-system, sans-serif;
     -webkit-font-smoothing:antialiased;
   }
-  .mono{ font-family:'JetBrains Mono', ui-monospace, monospace; }
+  .mono{ font-family:ui-monospace, 'SF Mono', monospace; }
 
   header{
-    padding: 28px 20px 20px;
+    padding: 24px 20px;
     border-bottom: 1px solid var(--line);
     position: sticky;
     top: 0;
     background: var(--bg);
     z-index: 10;
   }
-  .brand-row{
-    display:flex;
-    align-items:baseline;
-    gap:10px;
-    margin-bottom:18px;
-  }
-  .brand-row h1{
-    font-size: 22px;
-    font-weight: 800;
-    letter-spacing: -0.01em;
-    margin:0;
-  }
-  .brand-row span{
-    font-size: 12px;
-    color: var(--sub);
-    font-family:'JetBrains Mono', monospace;
-  }
+  .brand-row{ display:flex; align-items:baseline; gap:10px; }
+  .brand-row h1{ font-size: 20px; font-weight: 800; margin:0; cursor:pointer; }
+  .brand-row span{ font-size: 11px; color: var(--sub); font-family:ui-monospace,monospace; }
 
-  .search-wrap{
-    max-width: 720px;
-  }
-  .search-box{
-    display:flex;
-    align-items:center;
-    background: var(--card);
-    border: 1.5px solid var(--line);
-    border-radius: 10px;
-    padding: 12px 14px;
-    gap: 10px;
-  }
-  .search-box:focus-within{
-    border-color: var(--accent);
-  }
-  .search-box input{
-    border:none;
-    outline:none;
-    font-size:16px;
-    flex:1;
-    background:transparent;
-    color: var(--ink);
-    font-family:'Pretendard', sans-serif;
-  }
-  .search-box input::placeholder{ color:#9AA6A0; }
-  .search-icon{ color: var(--sub); flex-shrink:0; }
-
-  .tags{
-    display:flex;
-    flex-wrap:wrap;
-    gap:6px;
-    margin-top:10px;
-    max-width: 720px;
-  }
-  .tag{
-    font-family:'JetBrains Mono', monospace;
-    font-size: 11.5px;
-    padding: 4px 9px;
-    border-radius: 6px;
-    border: 1px solid var(--line);
-    background: var(--card);
-    color: var(--sub);
-    cursor: pointer;
-    white-space: nowrap;
-  }
-  .tag:hover{ border-color: var(--cold); color: var(--cold); }
-  .tag.active{ background: var(--accent); border-color: var(--accent); color: #fff; }
-
-  main{ padding: 20px; max-width: 1100px; margin: 0 auto; }
-
-  .empty-state{
-    text-align:center;
-    padding: 90px 20px;
+  .breadcrumb{
+    margin-top: 10px;
+    font-size: 13px;
     color: var(--sub);
   }
-  .empty-state .big{
-    font-size: 15px;
-    color: var(--ink);
-    font-weight: 600;
-    margin-bottom: 6px;
-  }
-  .empty-state .small{ font-size: 13px; }
+  .breadcrumb .crumb{ cursor:pointer; color: var(--cold); }
+  .breadcrumb .crumb:hover{ text-decoration: underline; }
 
-  .result-count{
-    font-family:'JetBrains Mono', monospace;
-    font-size: 12px;
-    color: var(--sub);
-    margin: 4px 0 16px;
-  }
+  main{ padding: 16px 20px 60px; max-width: 1000px; margin: 0 auto; }
 
-  .grid{
+  /* 브랜드 목록 */
+  .brand-grid{
     display:grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 16px;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 12px;
+    margin-top: 16px;
   }
-
-  .item-card{
+  .brand-card{
     background: var(--card);
     border: 1px solid var(--line);
     border-radius: 12px;
-    overflow: hidden;
-  }
-  .photo-strip{
-    display:grid;
-    grid-auto-flow: column;
-    grid-auto-columns: 100%;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    aspect-ratio: 4/3;
-    background: #E3E8E5;
-  }
-  .photo-strip img{
-    width:100%; height:100%;
-    object-fit: cover;
-    scroll-snap-align: start;
-  }
-  .photo-strip .no-photo{
-    display:flex; align-items:center; justify-content:center;
-    color: var(--sub);
-    font-size: 12px;
-    font-family:'JetBrains Mono', monospace;
-  }
-  .item-body{ padding: 12px 14px 14px; }
-  .item-brand{
-    font-family:'JetBrains Mono', monospace;
-    font-size: 11px;
-    color: var(--accent);
+    padding: 20px 12px;
+    text-align: center;
+    cursor: pointer;
     font-weight: 700;
-    letter-spacing: 0.02em;
-  }
-  .item-name{
     font-size: 15px;
-    font-weight: 700;
-    margin: 3px 0 6px;
   }
-  .item-meta{
-    font-size: 12.5px;
+  .brand-card:hover{ border-color: var(--accent); color: var(--accent); }
+  .brand-card .count{
+    display:block;
+    font-size: 11px;
     color: var(--sub);
-    line-height: 1.5;
+    font-weight: 400;
+    margin-top: 4px;
+    font-family: ui-monospace,monospace;
   }
-  .photo-count{
-    font-family:'JetBrains Mono', monospace;
-    font-size: 10.5px;
-    color: var(--sub);
-    margin-top: 6px;
+
+  /* 부위 목록 */
+  .part-list{ margin-top: 16px; display:flex; flex-direction:column; gap:10px; }
+  .part-card{
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 14px 16px;
+    cursor: pointer;
+    display:flex;
+    justify-content: space-between;
+    align-items:center;
   }
+  .part-card:hover{ border-color: var(--accent); }
+  .part-card .name{ font-weight: 700; font-size: 15px; }
+  .part-card .photo-count{ font-size: 12px; color: var(--sub); font-family: ui-monospace,monospace; }
+
+  /* 상세 화면 */
+  .detail-info{
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 16px 18px;
+    margin-top: 16px;
+  }
+  .detail-info .row{
+    display:flex;
+    justify-content: space-between;
+    padding: 7px 0;
+    border-bottom: 1px dashed var(--line);
+    font-size: 13.5px;
+  }
+  .detail-info .row:last-child{ border-bottom:none; }
+  .detail-info .row .k{ color: var(--sub); }
+  .detail-info .row .v{ font-weight: 600; font-family: ui-monospace,monospace; text-align:right; }
+
+  .photo-scroll{
+    margin-top: 16px;
+    display:flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+  }
+  .photo-scroll img{
+    height: 260px;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    background: #fff;
+    flex-shrink:0;
+  }
+
+  .empty-state{ text-align:center; padding: 60px 20px; color: var(--sub); }
 </style>
 </head>
 <body>
 
 <header>
-  <div class="brand-row">
+  <div class="brand-row" onclick="goHome()">
     <h1>축산 라이브러리</h1>
     <span>PHOTO ARCHIVE</span>
   </div>
-  <div class="search-wrap">
-    <div class="search-box">
-      <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <input id="searchInput" type="text" placeholder="브랜드나 품목명으로 검색 (예: SEARA 삼겹)" autocomplete="off">
-    </div>
-    <div class="tags" id="brandTags"></div>
-  </div>
+  <div class="breadcrumb" id="breadcrumb"></div>
 </header>
 
-<main>
-  <div id="resultCount" class="result-count" style="display:none;"></div>
-  <div id="grid" class="grid"></div>
-  <div id="emptyState" class="empty-state">
-    <div class="big">아직 등록된 사진이 없습니다</div>
-    <div class="small">사진이 추가되면 여기서 브랜드·품목명으로 검색할 수 있어요</div>
-  </div>
-</main>
+<main id="main"></main>
 
 <script>
-  let ITEMS = [];
-  let BRANDS = [];
-  let activeBrand = null;
+  let MANIFEST = {};
+  let state = { brand: null, part: null };
 
   async function loadData(){
     try {
-      const [itemsRes, brandsRes] = await Promise.all([
-        fetch('data/manifest.json').then(r => r.ok ? r.json() : []),
-        fetch('data/brands.json').then(r => r.ok ? r.json() : [])
-      ]);
-      ITEMS = itemsRes || [];
-      BRANDS = brandsRes || [];
+      MANIFEST = await fetch('data/manifest.json').then(r => r.json());
     } catch(e) {
-      console.error('데이터 로드 실패', e);
-      ITEMS = [];
-      BRANDS = [];
+      console.error('로드 실패', e);
+      MANIFEST = {};
     }
-    renderBrandTags();
     render();
   }
 
-  function renderBrandTags(){
-    const wrap = document.getElementById('brandTags');
-    wrap.innerHTML = '';
-    BRANDS.forEach(b => {
-      const el = document.createElement('div');
-      el.className = 'tag' + (activeBrand === b ? ' active' : '');
-      el.textContent = b;
-      el.onclick = () => {
-        activeBrand = (activeBrand === b) ? null : b;
-        renderBrandTags();
-        render();
-      };
-      wrap.appendChild(el);
-    });
-  }
+  function goHome(){ state = { brand: null, part: null }; render(); }
+  function goBrand(b){ state = { brand: b, part: null }; render(); }
+  function goPart(b, p){ state = { brand: b, part: p }; render(); }
 
-  function matches(item, query, brand){
-    const hay = (item.brand + ' ' + item.name + ' ' + (item.part||'') + ' ' + (item.notes||'')).toLowerCase();
-    const q = query.trim().toLowerCase();
-    if (brand && item.brand !== brand) return false;
-    if (!q) return true;
-    return q.split(/\s+/).every(term => hay.includes(term));
+  function renderBreadcrumb(){
+    const bc = document.getElementById('breadcrumb');
+    let html = `<span class="crumb" onclick="goHome()">전체</span>`;
+    if (state.brand){
+      html += ` / <span class="crumb" onclick="goBrand('${state.brand}')">${state.brand}</span>`;
+    }
+    if (state.part){
+      const displayName = MANIFEST[state.brand][state.part].displayName;
+      html += ` / <span>${displayName}</span>`;
+    }
+    bc.innerHTML = html;
   }
 
   function render(){
-    const query = document.getElementById('searchInput').value;
-    const filtered = ITEMS.filter(it => matches(it, query, activeBrand));
+    renderBreadcrumb();
+    const main = document.getElementById('main');
+    const brands = Object.keys(MANIFEST);
 
-    const grid = document.getElementById('grid');
-    const emptyState = document.getElementById('emptyState');
-    const resultCount = document.getElementById('resultCount');
-
-    if (ITEMS.length === 0) {
-      grid.innerHTML = '';
-      resultCount.style.display = 'none';
-      emptyState.style.display = 'block';
-      emptyState.querySelector('.big').textContent = '아직 등록된 사진이 없습니다';
-      emptyState.querySelector('.small').textContent = '사진이 추가되면 여기서 브랜드·품목명으로 검색할 수 있어요';
+    if (brands.length === 0){
+      main.innerHTML = `<div class="empty-state">아직 등록된 사진이 없습니다</div>`;
       return;
     }
 
-    if (filtered.length === 0) {
-      grid.innerHTML = '';
-      resultCount.style.display = 'none';
-      emptyState.style.display = 'block';
-      emptyState.querySelector('.big').textContent = '검색 결과가 없습니다';
-      emptyState.querySelector('.small').textContent = '다른 브랜드나 품목명으로 검색해보세요';
+    // 1단계: 브랜드 목록
+    if (!state.brand){
+      main.innerHTML = `<div class="brand-grid">` + brands.map(b => {
+        const partCount = Object.keys(MANIFEST[b]).length;
+        return `<div class="brand-card" onclick="goBrand('${b}')">${b}<span class="count">${partCount}개 부위</span></div>`;
+      }).join('') + `</div>`;
       return;
     }
 
-    emptyState.style.display = 'none';
-    resultCount.style.display = 'block';
-    resultCount.textContent = `${filtered.length}건`;
+    // 2단계: 부위 목록
+    if (state.brand && !state.part){
+      const parts = MANIFEST[state.brand];
+      main.innerHTML = `<div class="part-list">` + Object.keys(parts).map(p => {
+        const obj = parts[p];
+        return `<div class="part-card" onclick="goPart('${state.brand}','${p}')">
+          <span class="name">${obj.displayName}</span>
+          <span class="photo-count">사진 ${obj.photos.length}장</span>
+        </div>`;
+      }).join('') + `</div>`;
+      return;
+    }
 
-    grid.innerHTML = filtered.map(it => {
-      const photos = it.photos && it.photos.length ? it.photos : [];
-      const photoHtml = photos.length
-        ? photos.map(url => `<img src="${url}" loading="lazy" alt="${it.name}">`).join('')
-        : `<div class="no-photo">사진 없음</div>`;
-      return `
-        <div class="item-card">
-          <div class="photo-strip">${photoHtml}</div>
-          <div class="item-body">
-            <div class="item-brand">${it.brand || ''}</div>
-            <div class="item-name">${it.name || ''}</div>
-            <div class="item-meta">${it.part ? it.part + ' · ' : ''}${it.notes || ''}</div>
-            ${photos.length ? `<div class="photo-count">사진 ${photos.length}장</div>` : ''}
-          </div>
-        </div>
-      `;
-    }).join('');
+    // 3단계: 상세 (사진 + 정보)
+    const obj = MANIFEST[state.brand][state.part];
+    const photoHtml = obj.photos.map(url => `<img src="${url}" loading="lazy">`).join('');
+    const infoHtml = Object.entries(obj.info).map(([k,v]) => `
+      <div class="row"><span class="k">${k}</span><span class="v">${v}</span></div>
+    `).join('');
+
+    main.innerHTML = `
+      <div class="photo-scroll">${photoHtml}</div>
+      <div class="detail-info">${infoHtml}</div>
+    `;
   }
 
-  document.getElementById('searchInput').addEventListener('input', render);
   loadData();
 </script>
 
