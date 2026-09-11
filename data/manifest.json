@@ -245,5 +245,57 @@
         "images/AGROSUPER/gabri_11/09.png"
       ]
     }
+  },
+  "OLYMEL": {
+    "deungppyeo": {
+      "displayName": "등뼈",
+      "info": {
+        "창고명": "신우냉장",
+        "품목명": "돈등뼈 OLYMEL 30700 10",
+        "재고수량": "1,146",
+        "중량(kg)": "22,974.5",
+        "BL번호": "MEDURS230700",
+        "유통기한": "2028.02.18",
+        "통관상태": "통관",
+        "촬영일": "2026.09.11"
+      },
+      "photos": [
+        "images/OLYMEL/deungppyeo/01.png",
+        "images/OLYMEL/deungppyeo/02.png",
+        "images/OLYMEL/deungppyeo/03.png",
+        "images/OLYMEL/deungppyeo/04.png",
+        "images/OLYMEL/deungppyeo/05.png",
+        "images/OLYMEL/deungppyeo/06.png",
+        "images/OLYMEL/deungppyeo/07.jpg",
+        "images/OLYMEL/deungppyeo/08.jpg",
+        "images/OLYMEL/deungppyeo/09.jpg",
+        "images/OLYMEL/deungppyeo/10.jpg"
+      ]
+    }
+  },
+  "RIVASAM": {
+    "igyeop": {
+      "displayName": "이겹살",
+      "info": {
+        "창고명": "신우냉장",
+        "품목명": "돈이겹살 RIVASAM 9414 10107090Z",
+        "재고수량": "1,049",
+        "중량(kg)": "23,062.26",
+        "BL번호": "IBC1439414",
+        "유통기한": "2027.12.14",
+        "통관상태": "통관",
+        "촬영일": "2026.09.11"
+      },
+      "photos": [
+        "images/RIVASAM/igyeop/01.png",
+        "images/RIVASAM/igyeop/02.png",
+        "images/RIVASAM/igyeop/03.png",
+        "images/RIVASAM/igyeop/04.png",
+        "images/RIVASAM/igyeop/05.png",
+        "images/RIVASAM/igyeop/06.png",
+        "images/RIVASAM/igyeop/07.jpg",
+        "images/RIVASAM/igyeop/08.jpg"
+      ]
+    }
   }
 }
