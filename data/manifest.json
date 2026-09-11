@@ -97,6 +97,32 @@
         "images/SEARA/samgyeop/06.jpg",
         "images/SEARA/samgyeop/07.jpg"
       ]
+    },
+    "galbi": {
+      "displayName": "갈비",
+      "info": {
+        "창고명": "신우냉장",
+        "품목명": "돈갈비 SEARA 6620 SIF490",
+        "재고수량": "40",
+        "중량(kg)": "600",
+        "BL번호": "MEDUWE206620",
+        "유통기한": "2028.04.12",
+        "통관상태": "통관",
+        "촬영일": "2026.09.11"
+      },
+      "photos": [
+        "images/SEARA/galbi/01.png",
+        "images/SEARA/galbi/02.png",
+        "images/SEARA/galbi/03.png",
+        "images/SEARA/galbi/04.png",
+        "images/SEARA/galbi/05.png",
+        "images/SEARA/galbi/06.png",
+        "images/SEARA/galbi/07.png",
+        "images/SEARA/galbi/08.png",
+        "images/SEARA/galbi/09.png",
+        "images/SEARA/galbi/10.jpg",
+        "images/SEARA/galbi/11.jpg"
+      ]
     }
   },
   "SEABOARD": {
