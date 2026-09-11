@@ -270,6 +270,30 @@
         "images/AGROSUPER/gabri_11/08.png",
         "images/AGROSUPER/gabri_11/09.png"
       ]
+    },
+    "moksal": {
+      "displayName": "목살",
+      "info": {
+        "창고명": "신우냉장",
+        "품목명": "돈목살 AGROSUPER 7999 M 06-02",
+        "재고수량": "248",
+        "중량(kg)": "2,774.66",
+        "BL번호": "HLCUSCL260617999",
+        "유통기한": "2028.03.04",
+        "통관상태": "통관",
+        "촬영일": "2026.09.11"
+      },
+      "photos": [
+        "images/AGROSUPER/moksal/01.png",
+        "images/AGROSUPER/moksal/02.png",
+        "images/AGROSUPER/moksal/03.png",
+        "images/AGROSUPER/moksal/04.png",
+        "images/AGROSUPER/moksal/05.png",
+        "images/AGROSUPER/moksal/06.png",
+        "images/AGROSUPER/moksal/07.png",
+        "images/AGROSUPER/moksal/08.jpg",
+        "images/AGROSUPER/moksal/09.jpg"
+      ]
     }
   },
   "OLYMEL": {
