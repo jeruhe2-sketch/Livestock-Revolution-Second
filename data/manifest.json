@@ -52,6 +52,51 @@
         "images/SEARA/mokppyeo/08.jpg",
         "images/SEARA/mokppyeo/09.jpg"
       ]
+    },
+    "huji": {
+      "displayName": "후지",
+      "info": {
+        "창고명": "신우냉장",
+        "품목명": "돈후지 SEARA 9286 SIF490",
+        "재고수량": "915",
+        "중량(kg)": "19,912.16",
+        "BL번호": "MEDUWE119286",
+        "유통기한": "2028.03.31",
+        "통관상태": "통관",
+        "촬영일": "2026.09.11"
+      },
+      "photos": [
+        "images/SEARA/huji/01.jpg",
+        "images/SEARA/huji/02.jpg",
+        "images/SEARA/huji/03.jpg",
+        "images/SEARA/huji/04.jpg",
+        "images/SEARA/huji/05.jpg",
+        "images/SEARA/huji/06.jpg",
+        "images/SEARA/huji/07.jpg",
+        "images/SEARA/huji/08.jpg"
+      ]
+    },
+    "samgyeop": {
+      "displayName": "삼겹 (일부만 업로드됨, 4장 추가 예정)",
+      "info": {
+        "창고명": "신우냉장",
+        "품목명": "돈삼겹살 SEARA 8323 SIF490",
+        "재고수량": "1,562",
+        "중량(kg)": "22,984.86",
+        "BL번호": "MEDUWE008323",
+        "유통기한": "2027.12.08",
+        "통관상태": "통관",
+        "촬영일": "2026.09.11"
+      },
+      "photos": [
+        "images/SEARA/samgyeop/01.jpg",
+        "images/SEARA/samgyeop/02.jpg",
+        "images/SEARA/samgyeop/03.jpg",
+        "images/SEARA/samgyeop/04.jpg",
+        "images/SEARA/samgyeop/05.jpg",
+        "images/SEARA/samgyeop/06.jpg",
+        "images/SEARA/samgyeop/07.jpg"
+      ]
     }
   },
   "SEABOARD": {
@@ -102,6 +147,26 @@
         "images/SEABOARD/gabri_random/08.jpg",
         "images/SEABOARD/gabri_random/09.jpg",
         "images/SEABOARD/gabri_random/10.jpg"
+      ]
+    },
+    "mokppyeo": {
+      "displayName": "목뼈",
+      "info": {
+        "창고명": "신우냉장",
+        "품목명": "돈목뼈 SEABOARD 49900 46071",
+        "재고수량": "608",
+        "중량(kg)": "9,120",
+        "BL번호": "ONEYRICGG3949900",
+        "유통기한": "2028.03.16",
+        "통관상태": "통관",
+        "촬영일": "2026.09.11"
+      },
+      "photos": [
+        "images/SEABOARD/mokppyeo/01.jpg",
+        "images/SEABOARD/mokppyeo/02.jpg",
+        "images/SEABOARD/mokppyeo/03.jpg",
+        "images/SEABOARD/mokppyeo/04.jpg",
+        "images/SEABOARD/mokppyeo/05.jpg"
       ]
     }
   },
