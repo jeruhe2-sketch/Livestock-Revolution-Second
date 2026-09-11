@@ -297,5 +297,37 @@
         "images/RIVASAM/igyeop/08.jpg"
       ]
     }
+  },
+  "PATEL": {
+    "samgyeop": {
+      "displayName": "삼겹",
+      "info": {
+        "창고명": "신우냉장",
+        "품목명": "돈삼겹살 PATEL 8845 1001293B",
+        "재고수량": "774",
+        "중량(kg)": "12,692.3",
+        "BL번호": "EGLV571600008845",
+        "유통기한": "2028.03.05",
+        "통관상태": "통관",
+        "촬영일": "2026.09.11"
+      },
+      "photos": [
+        "images/PATEL/samgyeop/01.png",
+        "images/PATEL/samgyeop/02.png",
+        "images/PATEL/samgyeop/03.png",
+        "images/PATEL/samgyeop/04.png",
+        "images/PATEL/samgyeop/05.png",
+        "images/PATEL/samgyeop/06.png",
+        "images/PATEL/samgyeop/07.png",
+        "images/PATEL/samgyeop/08.png",
+        "images/PATEL/samgyeop/09.png",
+        "images/PATEL/samgyeop/10.png",
+        "images/PATEL/samgyeop/11.png",
+        "images/PATEL/samgyeop/12.jpg",
+        "images/PATEL/samgyeop/13.jpg",
+        "images/PATEL/samgyeop/14.jpg",
+        "images/PATEL/samgyeop/15.jpg"
+      ]
+    }
   }
 }
