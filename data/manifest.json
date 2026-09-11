@@ -89,6 +89,28 @@
     }
   },
   "AGROSUPER": {
+    "jeonji": {
+      "displayName": "전지",
+      "info": {
+        "창고명": "신우냉장",
+        "품목명": "돈전지 AGROSUPER 51900 06-01",
+        "재고수량": "2",
+        "중량(kg)": "35.33",
+        "BL번호": "ONEYSCLG15351900",
+        "유통기한": "2028.01.21",
+        "통관상태": "통관",
+        "촬영일": "2026.09.11"
+      },
+      "photos": [
+        "images/AGROSUPER/jeonji/01.png",
+        "images/AGROSUPER/jeonji/02.png",
+        "images/AGROSUPER/jeonji/03.png",
+        "images/AGROSUPER/jeonji/04.png",
+        "images/AGROSUPER/jeonji/05.png",
+        "images/AGROSUPER/jeonji/06.png",
+        "images/AGROSUPER/jeonji/07.png"
+      ]
+    },
     "hangjeong": {
       "displayName": "항정살 (칠레산)",
       "info": {

@@ -41,9 +41,58 @@
     margin-top: 10px;
     font-size: 13px;
     color: var(--sub);
+    display:flex;
+    align-items:center;
+    gap:10px;
   }
   .breadcrumb .crumb{ cursor:pointer; color: var(--cold); }
   .breadcrumb .crumb:hover{ text-decoration: underline; }
+  .back-btn{
+    display:inline-flex;
+    align-items:center;
+    gap:4px;
+    padding: 5px 10px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--card);
+    cursor: pointer;
+    font-size: 12.5px;
+    color: var(--ink);
+    font-weight: 600;
+  }
+  .back-btn:hover{ border-color: var(--cold); color: var(--cold); }
+
+  .photo-wrap{ position: relative; flex-shrink:0; }
+  .download-btn{
+    position:absolute;
+    bottom: 8px;
+    right: 8px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: rgba(22,32,28,0.75);
+    border:none;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+  }
+  .download-btn:hover{ background: var(--accent); }
+  .download-all-btn{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    margin-top: 12px;
+    padding: 9px 14px;
+    border-radius: 9px;
+    border: 1px solid var(--line);
+    background: var(--card);
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--ink);
+  }
+  .download-all-btn:hover{ border-color: var(--accent); color: var(--accent); }
 
   main{ padding: 16px 20px 60px; max-width: 1000px; margin: 0 auto; }
 
@@ -157,9 +206,19 @@
   function goBrand(b){ state = { brand: b, part: null }; render(); }
   function goPart(b, p){ state = { brand: b, part: p }; render(); }
 
+  function goBack(){
+    if (state.part){ state.part = null; }
+    else if (state.brand){ state.brand = null; }
+    render();
+  }
+
   function renderBreadcrumb(){
     const bc = document.getElementById('breadcrumb');
-    let html = `<span class="crumb" onclick="goHome()">전체</span>`;
+    let html = '';
+    if (state.brand){
+      html += `<span class="back-btn" onclick="goBack()">← 뒤로</span>`;
+    }
+    html += `<span class="crumb" onclick="goHome()">전체</span>`;
     if (state.brand){
       html += ` / <span class="crumb" onclick="goBrand('${state.brand}')">${state.brand}</span>`;
     }
@@ -204,15 +263,42 @@
 
     // 3단계: 상세 (사진 + 정보)
     const obj = MANIFEST[state.brand][state.part];
-    const photoHtml = obj.photos.map(url => `<img src="${url}" loading="lazy">`).join('');
+    const photoHtml = obj.photos.map((url, i) => `
+      <div class="photo-wrap">
+        <img src="${url}" loading="lazy">
+        <button class="download-btn" onclick="downloadPhoto('${url}', ${i})" title="다운로드">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2"><path d="M12 3v12"/><path d="M6 11l6 6 6-6"/><path d="M5 21h14"/></svg>
+        </button>
+      </div>
+    `).join('');
     const infoHtml = Object.entries(obj.info).map(([k,v]) => `
       <div class="row"><span class="k">${k}</span><span class="v">${v}</span></div>
     `).join('');
 
     main.innerHTML = `
       <div class="photo-scroll">${photoHtml}</div>
+      <button class="download-all-btn" onclick="downloadAll()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 3v12"/><path d="M6 11l6 6 6-6"/><path d="M5 21h14"/></svg>
+        전체 ${obj.photos.length}장 다운로드
+      </button>
       <div class="detail-info">${infoHtml}</div>
     `;
+  }
+
+  function downloadPhoto(url, i){
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${state.brand}_${state.part}_${String(i+1).padStart(2,'0')}.png`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
+
+  function downloadAll(){
+    const obj = MANIFEST[state.brand][state.part];
+    obj.photos.forEach((url, i) => {
+      setTimeout(() => downloadPhoto(url, i), i * 300);
+    });
   }
 
   loadData();
