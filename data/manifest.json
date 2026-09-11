@@ -19,7 +19,14 @@
         "images/SEARA/jeonji/04.png",
         "images/SEARA/jeonji/05.png",
         "images/SEARA/jeonji/06.png",
-        "images/SEARA/jeonji/07.png"
+        "images/SEARA/jeonji/07.png",
+        "images/SEARA/jeonji/08.jpg",
+        "images/SEARA/jeonji/09.jpg",
+        "images/SEARA/jeonji/10.jpg",
+        "images/SEARA/jeonji/11.jpg",
+        "images/SEARA/jeonji/12.jpg",
+        "images/SEARA/jeonji/13.jpg",
+        "images/SEARA/jeonji/14.jpg"
       ]
     },
     "mokppyeo": {
@@ -40,7 +47,10 @@
         "images/SEARA/mokppyeo/03.png",
         "images/SEARA/mokppyeo/04.png",
         "images/SEARA/mokppyeo/05.png",
-        "images/SEARA/mokppyeo/06.png"
+        "images/SEARA/mokppyeo/06.png",
+        "images/SEARA/mokppyeo/07.jpg",
+        "images/SEARA/mokppyeo/08.jpg",
+        "images/SEARA/mokppyeo/09.jpg"
       ]
     }
   },
@@ -62,7 +72,11 @@
         "images/SEABOARD/gabri_jungfood/02.png",
         "images/SEABOARD/gabri_jungfood/03.png",
         "images/SEABOARD/gabri_jungfood/04.png",
-        "images/SEABOARD/gabri_jungfood/05.png"
+        "images/SEABOARD/gabri_jungfood/05.png",
+        "images/SEABOARD/gabri_jungfood/06.jpg",
+        "images/SEABOARD/gabri_jungfood/07.jpg",
+        "images/SEABOARD/gabri_jungfood/08.jpg",
+        "images/SEABOARD/gabri_jungfood/09.jpg"
       ]
     },
     "gabri_random": {
@@ -84,7 +98,10 @@
         "images/SEABOARD/gabri_random/04.png",
         "images/SEABOARD/gabri_random/05.png",
         "images/SEABOARD/gabri_random/06.png",
-        "images/SEABOARD/gabri_random/07.png"
+        "images/SEABOARD/gabri_random/07.png",
+        "images/SEABOARD/gabri_random/08.jpg",
+        "images/SEABOARD/gabri_random/09.jpg",
+        "images/SEABOARD/gabri_random/10.jpg"
       ]
     }
   },
@@ -108,7 +125,11 @@
         "images/AGROSUPER/jeonji/04.png",
         "images/AGROSUPER/jeonji/05.png",
         "images/AGROSUPER/jeonji/06.png",
-        "images/AGROSUPER/jeonji/07.png"
+        "images/AGROSUPER/jeonji/07.png",
+        "images/AGROSUPER/jeonji/08.jpg",
+        "images/AGROSUPER/jeonji/09.jpg",
+        "images/AGROSUPER/jeonji/10.jpg",
+        "images/AGROSUPER/jeonji/11.jpg"
       ]
     },
     "hangjeong": {
@@ -129,7 +150,10 @@
         "images/AGROSUPER/hangjeong/03.png",
         "images/AGROSUPER/hangjeong/04.png",
         "images/AGROSUPER/hangjeong/05.png",
-        "images/AGROSUPER/hangjeong/06.png"
+        "images/AGROSUPER/hangjeong/06.png",
+        "images/AGROSUPER/hangjeong/07.jpg",
+        "images/AGROSUPER/hangjeong/08.jpg",
+        "images/AGROSUPER/hangjeong/09.jpg"
       ]
     },
     "gabri_11": {
