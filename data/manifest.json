@@ -294,6 +294,33 @@
         "images/AGROSUPER/moksal/08.jpg",
         "images/AGROSUPER/moksal/09.jpg"
       ]
+    },
+    "michuri_samgyeop": {
+      "displayName": "미추리삼겹 (폐기예정,미통관)",
+      "info": {
+        "창고명": "신우냉장",
+        "품목명": "돈미추리삼겹 AGROSUPER 51900 06-06",
+        "재고수량": "3",
+        "중량(kg)": "57.13",
+        "BL번호": "ONEYSCLG15351900",
+        "유통기한": "2028.01.06",
+        "통관상태": "미통관",
+        "촬영일": "2026.09.11"
+      },
+      "photos": [
+        "images/AGROSUPER/michuri_samgyeop/01.png",
+        "images/AGROSUPER/michuri_samgyeop/02.png",
+        "images/AGROSUPER/michuri_samgyeop/03.png",
+        "images/AGROSUPER/michuri_samgyeop/04.png",
+        "images/AGROSUPER/michuri_samgyeop/05.png",
+        "images/AGROSUPER/michuri_samgyeop/06.png",
+        "images/AGROSUPER/michuri_samgyeop/07.png",
+        "images/AGROSUPER/michuri_samgyeop/08.png",
+        "images/AGROSUPER/michuri_samgyeop/09.jpg",
+        "images/AGROSUPER/michuri_samgyeop/10.jpg",
+        "images/AGROSUPER/michuri_samgyeop/11.jpg",
+        "images/AGROSUPER/michuri_samgyeop/12.jpg"
+      ]
     }
   },
   "OLYMEL": {
