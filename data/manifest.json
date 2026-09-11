@@ -321,6 +321,34 @@
         "images/AGROSUPER/michuri_samgyeop/11.jpg",
         "images/AGROSUPER/michuri_samgyeop/12.jpg"
       ]
+    },
+    "hangjeong_original": {
+      "displayName": "항정살 (원본)",
+      "info": {
+        "창고명": "신우냉장",
+        "품목명": "작업항정살(돈차돌)A/S 0814 A(고기농가)",
+        "재고수량": "215",
+        "중량(kg)": "2,580",
+        "BL번호": "이력912009700814",
+        "유통기한": "2028.01.26",
+        "통관상태": "통관",
+        "촬영일": "2026.09.11"
+      },
+      "photos": [
+        "images/AGROSUPER/hangjeong_original/01.png",
+        "images/AGROSUPER/hangjeong_original/02.png",
+        "images/AGROSUPER/hangjeong_original/03.png",
+        "images/AGROSUPER/hangjeong_original/04.png",
+        "images/AGROSUPER/hangjeong_original/05.png",
+        "images/AGROSUPER/hangjeong_original/06.png",
+        "images/AGROSUPER/hangjeong_original/07.png",
+        "images/AGROSUPER/hangjeong_original/08.jpg",
+        "images/AGROSUPER/hangjeong_original/09.jpg",
+        "images/AGROSUPER/hangjeong_original/10.jpg",
+        "images/AGROSUPER/hangjeong_original/11.jpg",
+        "images/AGROSUPER/hangjeong_original/12.jpg",
+        "images/AGROSUPER/hangjeong_original/13.jpg"
+      ]
     }
   },
   "OLYMEL": {
