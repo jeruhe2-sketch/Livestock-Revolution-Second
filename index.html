@@ -528,7 +528,7 @@
     const photos = MANIFEST[state.brand][state.part].photos;
     const scrollEl = document.getElementById('lightbox-scroll');
     scrollEl.innerHTML = photos.map((url) => `
-      <div class="lightbox-slide"><img data-src="${url}" alt="" draggable="false" decoding="async"></div>
+      <div class="lightbox-slide"><img data-src="${url}" data-scale="1" data-tx="0" data-ty="0" alt="" draggable="false" decoding="async"></div>
     `).join('');
     updateLightboxCounter();
     document.getElementById('lightbox').classList.add('open');
@@ -635,6 +635,7 @@
             img.style.touchAction = 'pan-x';
           } else {
             img.dataset.scale = 2.5;
+            img.dataset.tx = 0; img.dataset.ty = 0;
             img.style.touchAction = 'none';
           }
           applyTransform(img);
