@@ -1,1 +1,4 @@
+=== PUT 요청 결과 ===
 {"success":true,"errors":[],"messages":[],"result":{}}
+=== 확인용 GET 결과 ===
+{"success":true,"errors":[],"messages":[],"result":{"rules":[{"allowed":{"origins":["*"],"methods":["GET","HEAD"]}}]}}
