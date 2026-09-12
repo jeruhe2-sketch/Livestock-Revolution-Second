@@ -24,6 +24,8 @@ jobs:
     steps:
       - name: 체크아웃
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_PUSH_TOKEN }}
 
       - name: AWS CLI로 R2(S3 호환) 접근 설정
         run: |
