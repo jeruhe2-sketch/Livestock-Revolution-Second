@@ -13,6 +13,7 @@ on:
           - list-all       # 버킷 전체 오브젝트 목록을 JSON으로 저장
           - list-folder    # 특정 폴더(prefix) 목록만 저장
           - upload-pending # _pending_upload/ 안의 파일들을 R2에 업로드 후 정리
+          - rename-files   # rename-map.json 기준으로 R2 오브젝트 이름 변경(copy+delete)
         default: list-all
       prefix:
         description: 'list-folder일 때 사용할 폴더 경로 (예: "37 57 높이 17 수퍼 돈전지 3pc/")'
@@ -75,6 +76,33 @@ jobs:
             --endpoint-url ${{ secrets.R2_ENDPOINT }} \
             --profile r2 \
             --output json > r2-inventory.json
+
+      - name: R2 오브젝트 이름 변경 (rename-map.json 기준)
+        if: ${{ github.event.inputs.action == 'rename-files' }}
+        run: |
+          python3 << 'PYEOF'
+          import json, subprocess, os
+          m = json.load(open('rename-map.json'))
+          endpoint = os.environ['R2_ENDPOINT']
+          for item in m['renames']:
+              src = item['from']
+              dst = item['to']
+              print(f"이동: {src} -> {dst}")
+              subprocess.run([
+                  "aws", "s3", "mv",
+                  f"s3://livestock-library/{src}",
+                  f"s3://livestock-library/{dst}",
+                  "--endpoint-url", endpoint,
+                  "--profile", "r2"
+              ], check=True)
+          PYEOF
+          aws s3api list-objects-v2 \
+            --bucket livestock-library \
+            --endpoint-url ${{ secrets.R2_ENDPOINT }} \
+            --profile r2 \
+            --output json > r2-inventory.json
+        env:
+          R2_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
 
       - name: 결과 커밋
         run: |

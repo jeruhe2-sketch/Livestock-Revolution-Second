@@ -81,7 +81,7 @@
       ]
     },
     "samgyeop": {
-      "displayName": "삼겹 (일부만 업로드됨, 4장 추가 예정)",
+      "displayName": "삼겹",
       "info": {
         "창고명": "신우냉장",
         "품목명": "돈삼겹살 SEARA 8323 SIF490",
@@ -138,7 +138,7 @@
   },
   "SEABOARD": {
     "gabri_jungfood": {
-      "displayName": "가브리 (정푸드 가공)",
+      "displayName": "작업가브리",
       "info": {
         "창고명": "신우냉장",
         "품목명": "작업가부리 SEABOARD 0952 (정푸드)",
@@ -163,7 +163,7 @@
       ]
     },
     "gabri_random": {
-      "displayName": "가브리 (랜덤)",
+      "displayName": "가브리",
       "info": {
         "창고명": "신우냉장",
         "품목명": "돈가부리 SEABOARD 9207 46071",
@@ -246,7 +246,7 @@
       ]
     },
     "hangjeong": {
-      "displayName": "항정살 (칠레산)",
+      "displayName": "작업항정",
       "info": {
         "창고명": "신우냉장",
         "품목명": "작업항정살 AGROSUPER 0678(ASSA정푸드)",
@@ -271,7 +271,7 @@
       ]
     },
     "gabri_11": {
-      "displayName": "가부리 (11쌍)",
+      "displayName": "가부리 11쌍",
       "info": {
         "창고명": "신우냉장",
         "품목명": "돈가부리 AGROSUPER 4211 06-02",
@@ -321,7 +321,7 @@
       ]
     },
     "michuri_samgyeop": {
-      "displayName": "미추리삼겹 (폐기예정,미통관)",
+      "displayName": "미추리삼겹 · 폐기예정,미통관",
       "info": {
         "창고명": "신우냉장",
         "품목명": "돈미추리삼겹 AGROSUPER 51900 06-06",
@@ -349,7 +349,7 @@
       ]
     },
     "hangjeong_original": {
-      "displayName": "항정살 (원본)",
+      "displayName": "항정살",
       "info": {
         "창고명": "신우냉장",
         "품목명": "작업항정살(돈차돌)A/S 0814 A(고기농가)",
