@@ -314,7 +314,7 @@
 
   async function loadData(){
     try {
-      MANIFEST = await fetch('data/manifest.json').then(r => r.json());
+      MANIFEST = await fetch('data/manifest.json?v=' + Date.now(), { cache: 'no-store' }).then(r => r.json());
     } catch(e) {
       console.error('로드 실패', e);
       MANIFEST = {};
