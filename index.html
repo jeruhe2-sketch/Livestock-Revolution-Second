@@ -53,9 +53,36 @@
     -webkit-backdrop-filter: blur(10px);
     z-index: 10;
   }
-  .brand-row{ display:flex; align-items:baseline; gap:10px; }
-  .brand-row h1{ font-size: 20px; font-weight: 800; margin:0; cursor:pointer; }
+  .brand-row{ display:flex; align-items:baseline; gap:10px; cursor:pointer; }
+  .brand-row h1{ font-size: 20px; font-weight: 800; margin:0; }
   .brand-row span{ font-size: 11px; color: var(--sub); font-family:ui-monospace,monospace; }
+
+  .chip-row{
+    display:flex;
+    gap: 8px;
+    overflow-x: auto;
+    margin-top: 12px;
+    padding-bottom: 2px;
+    scrollbar-width: none;
+  }
+  .chip-row::-webkit-scrollbar{ display:none; }
+  .chip{
+    flex-shrink:0;
+    padding: 7px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--line);
+    background: var(--card);
+    font-size: 13px;
+    font-weight: 600;
+    cursor:pointer;
+    white-space: nowrap;
+  }
+  .chip .n{ color: var(--sub); font-weight:400; margin-left:4px; font-size:11px; }
+  .chip.active{ background: var(--accent); border-color: var(--accent); color:#fff; }
+  .chip.active .n{ color: rgba(255,255,255,0.75); }
+  .part-chip-row{ margin-top: 8px; }
+  .part-chip-row .chip.active{ background: var(--cold); border-color: var(--cold); }
+  .part-chip-row.hidden{ display:none; }
 
   .breadcrumb{
     margin-top: 10px;
@@ -314,9 +341,6 @@
     header{ padding: 16px 14px; }
     .brand-row h1{ font-size: 17px; }
     main{ padding: 12px 14px 40px; }
-    .brand-grid{ grid-template-columns: repeat(auto-fill, minmax(105px, 1fr)); gap:8px; }
-    .brand-card{ padding: 14px 8px; font-size: 13.5px; }
-    .part-card{ padding: 12px 14px; }
     .photo-grid{ grid-template-columns: repeat(3, 1fr); gap:6px; }
     .photo-wrap img{ height: 108px; border-radius: 7px; }
     .download-btn{ width: 26px; height: 26px; bottom:5px; right:5px; }
@@ -334,16 +358,15 @@
     <h1>축산 라이브러리</h1>
     <span>PHOTO ARCHIVE</span>
   </div>
-  <div class="breadcrumb" id="breadcrumb"></div>
+  <div class="chip-row" id="brand-chips">
+    <div class="skeleton-card" style="width:70px;height:30px;border-radius:20px;flex-shrink:0;"></div>
+    <div class="skeleton-card" style="width:90px;height:30px;border-radius:20px;flex-shrink:0;"></div>
+    <div class="skeleton-card" style="width:60px;height:30px;border-radius:20px;flex-shrink:0;"></div>
+  </div>
+  <div class="chip-row part-chip-row hidden" id="part-chips"></div>
 </header>
 
-<main id="main">
-  <div class="brand-grid skeleton-grid">
-    <div class="skeleton-card"></div><div class="skeleton-card"></div>
-    <div class="skeleton-card"></div><div class="skeleton-card"></div>
-    <div class="skeleton-card"></div><div class="skeleton-card"></div>
-  </div>
-</main>
+<main id="main"></main>
 
 <div class="lightbox" id="lightbox">
   <button class="lightbox-close" onclick="closeLightbox()" title="닫기">
@@ -433,21 +456,27 @@
     history.back();
   }
 
-  function renderBreadcrumb(){
-    const bc = document.getElementById('breadcrumb');
-    let html = '';
+  function renderChips(){
+    const brands = Object.keys(MANIFEST);
+    const brandChipsEl = document.getElementById('brand-chips');
+    brandChipsEl.innerHTML = brands.map(b => {
+      const partCount = Object.keys(MANIFEST[b]).length;
+      const active = b === state.brand ? 'active' : '';
+      return `<div class="chip ${active}" onclick="goBrand('${b}')">${b}<span class="n">${partCount}</span></div>`;
+    }).join('');
+
+    const partChipsEl = document.getElementById('part-chips');
     if (state.brand){
-      html += `<span class="back-btn" onclick="goBack()">← 뒤로</span>`;
+      const parts = MANIFEST[state.brand];
+      partChipsEl.classList.remove('hidden');
+      partChipsEl.innerHTML = Object.keys(parts).map(p => {
+        const active = p === state.part ? 'active' : '';
+        return `<div class="chip ${active}" onclick="goPart('${state.brand}','${p}')">${parts[p].displayName}</div>`;
+      }).join('');
+    } else {
+      partChipsEl.classList.add('hidden');
+      partChipsEl.innerHTML = '';
     }
-    html += `<span class="crumb" onclick="goHome()">전체</span>`;
-    if (state.brand){
-      html += ` / <span class="crumb" onclick="goBrand('${state.brand}')">${state.brand}</span>`;
-    }
-    if (state.part){
-      const displayName = MANIFEST[state.brand][state.part].displayName;
-      html += ` / <span>${displayName}</span>`;
-    }
-    bc.innerHTML = html;
   }
 
   function render(){
@@ -459,7 +488,7 @@
   }
 
   function renderInner(){
-    renderBreadcrumb();
+    renderChips();
     const main = document.getElementById('main');
     const brands = Object.keys(MANIFEST);
 
@@ -468,29 +497,17 @@
       return;
     }
 
-    // 1단계: 브랜드 목록
     if (!state.brand){
-      main.innerHTML = `<div class="brand-grid">` + brands.map(b => {
-        const partCount = Object.keys(MANIFEST[b]).length;
-        return `<div class="brand-card" onclick="goBrand('${b}')">${b}<span class="count">${partCount}개 부위</span></div>`;
-      }).join('') + `</div>`;
+      main.innerHTML = `<div class="empty-state">위에서 브랜드를 눌러주세요</div>`;
       return;
     }
 
-    // 2단계: 부위 목록
-    if (state.brand && !state.part){
-      const parts = MANIFEST[state.brand];
-      main.innerHTML = `<div class="part-list">` + Object.keys(parts).map(p => {
-        const obj = parts[p];
-        return `<div class="part-card" onclick="goPart('${state.brand}','${p}')">
-          <span class="name">${obj.displayName}</span>
-          <span class="photo-count">사진 ${obj.photos.length}장</span>
-        </div>`;
-      }).join('') + `</div>`;
+    if (!state.part){
+      main.innerHTML = `<div class="empty-state">위에서 부위를 눌러주세요</div>`;
       return;
     }
 
-    // 3단계: 상세 (사진 + 정보)
+    // 사진 + 정보
     const obj = MANIFEST[state.brand][state.part];
     const photoHtml = obj.photos.map((url, i) => `
       <div class="photo-wrap skeleton-thumb">
