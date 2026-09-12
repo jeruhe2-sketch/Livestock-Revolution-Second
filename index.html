@@ -556,11 +556,13 @@
 
   // R2 등 외부 도메인 사진은 <a download>가 무시되고 그냥 열리기만 하므로
   // fetch로 받아 blob URL을 만들어 강제로 다운로드시킨다.
+  // 캐시된 옛 응답(CORS 헤더 없음)을 피하기 위해 캐시 우회 쿼리를 붙여서 요청한다.
   async function downloadPhoto(url, i, btnEl){
     if (btnEl) btnEl.classList.add('loading');
+    const bustUrl = url + (url.includes('?') ? '&' : '?') + '_dl=' + Date.now();
     try {
-      const res = await fetch(url);
-      if (!res.ok) throw new Error('fetch 실패');
+      const res = await fetch(bustUrl, { cache: 'no-store' });
+      if (!res.ok) throw new Error('fetch 실패: ' + res.status);
       const blob = await res.blob();
       const ext = (url.split('.').pop().split('?')[0] || 'jpg').slice(0,4);
       const blobUrl = URL.createObjectURL(blob);
