@@ -527,19 +527,30 @@
     lightboxIndex = i;
     const photos = MANIFEST[state.brand][state.part].photos;
     const scrollEl = document.getElementById('lightbox-scroll');
-    scrollEl.innerHTML = photos.map((url, idx) => `
-      <div class="lightbox-slide"><img src="${url}" alt="" draggable="false"></div>
+    scrollEl.innerHTML = photos.map((url) => `
+      <div class="lightbox-slide"><img data-src="${url}" alt="" draggable="false" decoding="async"></div>
     `).join('');
     updateLightboxCounter();
     document.getElementById('lightbox').classList.add('open');
     document.body.style.overflow = 'hidden';
+    ensureSlidesLoaded(scrollEl, i);
     // 스크롤 위치를 해당 인덱스로 즉시 이동 (애니메이션 없이)
     requestAnimationFrame(() => {
       lightboxScrolling = true;
       scrollEl.scrollTo({ left: i * scrollEl.clientWidth, behavior: 'instant' });
       setTimeout(() => { lightboxScrolling = false; }, 50);
     });
-    initZoomHandlers(scrollEl);
+  }
+
+  // 현재 인덱스와 바로 양옆 사진만 실제 로드 (전체를 한꺼번에 불러와서 버벅이는 것 방지)
+  function ensureSlidesLoaded(scrollEl, idx){
+    const slides = scrollEl.querySelectorAll('.lightbox-slide img');
+    [idx - 1, idx, idx + 1].forEach(n => {
+      const img = slides[n];
+      if (img && !img.src && img.dataset.src){
+        img.src = img.dataset.src;
+      }
+    });
   }
 
   function closeLightbox(){
@@ -576,6 +587,7 @@
           updateLightboxCounter();
           resetAllZoom(scrollEl);
         }
+        ensureSlidesLoaded(scrollEl, lightboxIndex);
       }, 100);
     }, { passive: true });
   }
@@ -729,6 +741,7 @@
   });
 
   bindLightboxScroll();
+  initZoomHandlers(document.getElementById('lightbox-scroll'));
 
   function showToast(msg){
     const t = document.getElementById('toast');
