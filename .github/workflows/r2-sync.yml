@@ -112,6 +112,11 @@ jobs:
           echo "=== 확인용 GET 결과 ===" >> cors-result.json
           curl -s "https://api.cloudflare.com/client/v4/accounts/${{ secrets.CF_ACCOUNT_ID }}/r2/buckets/livestock-library/cors" \
             -H "Authorization: Bearer ${{ secrets.CF_API_TOKEN }}" >> cors-result.json
+          echo "" >> cors-result.json
+          echo "=== 실제 오브젝트 응답 헤더 (Origin 헤더 넣어서 요청) ===" >> cors-result.json
+          TESTURL="https://pub-4a7975ff76ef42ed80c2fcfed0ae169e.r2.dev/SEARA/%EC%A0%84%EC%A7%80/SEARA_%EC%A0%84%EC%A7%80_HLCUIT1251021138_1.jpg"
+          echo "테스트 URL: $TESTURL" >> cors-result.json
+          curl -s -I -H "Origin: https://jeruhe2-sketch.github.io" "$TESTURL" >> cors-result.json
           cat cors-result.json
 
       - name: 결과 커밋

@@ -481,7 +481,7 @@
   async function copyPageLink(btnEl){
     const ok = await copyToClipboard(location.href);
     if (ok){
-      showToast('이 페이지 링크가 복사됐어요. 손님께 붙여넣기 해주세요.');
+      showToast('링크가 복사됐습니다.');
       if (btnEl){
         btnEl.classList.add('copied');
         setTimeout(() => btnEl.classList.remove('copied'), 1200);
