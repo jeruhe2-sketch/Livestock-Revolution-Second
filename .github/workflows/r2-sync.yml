@@ -12,6 +12,7 @@ on:
         options:
           - list-all       # 버킷 전체 오브젝트 목록을 JSON으로 저장
           - list-folder    # 특정 폴더(prefix) 목록만 저장
+          - upload-pending # _pending_upload/ 안의 파일들을 R2에 업로드 후 정리
         default: list-all
       prefix:
         description: 'list-folder일 때 사용할 폴더 경로 (예: "37 57 높이 17 수퍼 돈전지 3pc/")'
@@ -57,10 +58,28 @@ jobs:
             --profile r2 \
             --output json > r2-inventory.json
 
+      - name: 대기 중인 파일 R2 업로드
+        if: ${{ github.event.inputs.action == 'upload-pending' }}
+        run: |
+          if [ -d "_pending_upload" ]; then
+            aws s3 cp "_pending_upload/" "s3://livestock-library/" \
+              --recursive \
+              --endpoint-url ${{ secrets.R2_ENDPOINT }} \
+              --profile r2
+            rm -rf "_pending_upload"
+          else
+            echo "업로드 대기 파일 없음"
+          fi
+          aws s3api list-objects-v2 \
+            --bucket livestock-library \
+            --endpoint-url ${{ secrets.R2_ENDPOINT }} \
+            --profile r2 \
+            --output json > r2-inventory.json
+
       - name: 결과 커밋
         run: |
           git config user.name "R2 Sync Bot"
           git config user.email "actions@github.com"
-          git add r2-inventory.json
-          git diff --cached --quiet || git commit -m "R2 인벤토리 갱신 ($(date -u +%Y-%m-%dT%H:%M:%SZ))"
+          git add -A
+          git diff --cached --quiet || git commit -m "R2 동기화 ($(date -u +%Y-%m-%dT%H:%M:%SZ))"
           git push
