@@ -28,7 +28,10 @@
     --cold: #33586B;
     --card: #FFFFFF;
   }
-  *{box-sizing:border-box;}
+  *{box-sizing:border-box; -webkit-tap-highlight-color: transparent;}
+  button{ -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+  button:active{ transform: scale(0.94); }
+  .brand-card:active, .part-card:active{ transform: scale(0.98); }
   body{
     margin:0;
     background:var(--bg);
