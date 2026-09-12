@@ -343,39 +343,52 @@
       console.error('로드 실패', e);
       MANIFEST = {};
     }
-    applyHash();
+    applyStateFromHash();
+    // 첫 진입 상태를 히스토리 맨 앞에 기록해둔다 (뒤로가기의 최종 종착점)
+    history.replaceState({ brand: state.brand, part: state.part }, '', location.hash || location.pathname + location.search);
     render();
   }
 
-  function updateHash(){
-    if (state.brand && state.part){
-      history.replaceState(null, '', `#${encodeURIComponent(state.brand)}/${encodeURIComponent(state.part)}`);
-    } else if (state.brand){
-      history.replaceState(null, '', `#${encodeURIComponent(state.brand)}`);
-    } else {
-      history.replaceState(null, '', location.pathname + location.search);
-    }
-  }
-
-  function applyHash(){
+  function applyStateFromHash(){
     const hash = decodeURIComponent(location.hash.replace(/^#/, ''));
-    if (!hash) return;
+    if (!hash){ state = { brand: null, part: null }; return; }
     const [b, p] = hash.split('/');
     if (b && MANIFEST[b]){
       state.brand = b;
-      if (p && MANIFEST[b][p]) state.part = p;
+      state.part = (p && MANIFEST[b][p]) ? p : null;
+    } else {
+      state = { brand: null, part: null };
     }
   }
 
-  function goHome(){ state = { brand: null, part: null }; updateHash(); render(); }
-  function goBrand(b){ state = { brand: b, part: null }; updateHash(); render(); }
-  function goPart(b, p){ state = { brand: b, part: p }; updateHash(); render(); }
+  // 화면 전환할 때마다 히스토리에 새 항목을 쌓는다 -> 하드웨어/제스처 뒤로가기가 앱 안에서 동작하게 됨
+  function pushState(){
+    let hash;
+    if (state.brand && state.part) hash = `#${encodeURIComponent(state.brand)}/${encodeURIComponent(state.part)}`;
+    else if (state.brand) hash = `#${encodeURIComponent(state.brand)}`;
+    else hash = location.pathname + location.search;
+    history.pushState({ brand: state.brand, part: state.part }, '', hash);
+  }
 
-  function goBack(){
-    if (state.part){ state.part = null; }
-    else if (state.brand){ state.brand = null; }
-    updateHash();
+  window.addEventListener('popstate', (e) => {
+    const lb = document.getElementById('lightbox');
+    if (lb.classList.contains('open')) closeLightbox();
+    if (e.state){
+      state = { brand: e.state.brand || null, part: e.state.part || null };
+    } else {
+      applyStateFromHash();
+    }
     render();
+  });
+
+  function goHome(){ state = { brand: null, part: null }; pushState(); render(); }
+  function goBrand(b){ state = { brand: b, part: null }; pushState(); render(); }
+  function goPart(b, p){ state = { brand: b, part: p }; pushState(); render(); }
+
+  // 브레드크럼의 "뒤로" 버튼은 실제 브라우저 히스토리를 한 칸 되돌린다
+  // (popstate 리스너가 상태 복원과 렌더링을 처리)
+  function goBack(){
+    history.back();
   }
 
   function renderBreadcrumb(){
