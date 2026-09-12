@@ -79,10 +79,9 @@
   .back-btn:hover{ border-color: var(--cold); color: var(--cold); }
 
   .photo-wrap{ position: relative; flex-shrink:0; }
-  .download-btn{
+  .download-btn, .copy-btn{
     position:absolute;
     bottom: 8px;
-    right: 8px;
     width: 30px;
     height: 30px;
     border-radius: 50%;
@@ -93,7 +92,10 @@
     justify-content:center;
     cursor:pointer;
   }
-  .download-btn:hover{ background: var(--accent); }
+  .download-btn{ right: 8px; }
+  .copy-btn{ right: 44px; }
+  .download-btn:hover, .copy-btn:hover{ background: var(--accent); }
+  .copy-btn.copied{ background: var(--cold); }
   .download-all-btn{
     display:inline-flex;
     align-items:center;
@@ -109,6 +111,9 @@
     color: var(--ink);
   }
   .download-all-btn:hover{ border-color: var(--accent); color: var(--accent); }
+  .download-all-btn.secondary{ background: transparent; }
+  .action-row{ display:flex; gap:8px; flex-wrap:wrap; }
+  .action-row .download-all-btn{ margin-top: 12px; }
 
   main{ padding: 16px 20px 60px; max-width: 1000px; margin: 0 auto; }
 
@@ -246,6 +251,15 @@
   .lightbox-download:hover{ background: var(--accent); }
   .lightbox-download.loading svg{ animation: spin .8s linear infinite; }
   @keyframes spin{ to{ transform: rotate(360deg); } }
+  .lightbox-copy{
+    position:absolute; bottom:max(14px, env(safe-area-inset-bottom)); right:66px;
+    width:44px; height:44px; border-radius:50%;
+    background: rgba(255,255,255,0.12); border:none;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer; color:#fff;
+  }
+  .lightbox-copy:hover{ background: var(--accent); }
+  .lightbox-copy.copied{ background: var(--cold); }
 
   .toast{
     position: fixed; bottom: 24px; left:50%; transform: translateX(-50%);
@@ -267,8 +281,11 @@
     .part-card{ padding: 12px 14px; }
     .photo-grid{ grid-template-columns: repeat(3, 1fr); gap:6px; }
     .photo-wrap img{ height: 108px; border-radius: 7px; }
-    .download-btn{ width: 26px; height: 26px; bottom:5px; right:5px; }
-    .download-btn svg{ width:12px; height:12px; }
+    .download-btn, .copy-btn{ width: 26px; height: 26px; bottom:5px; }
+    .download-btn{ right:5px; }
+    .copy-btn{ right:35px; }
+    .download-btn svg, .copy-btn svg{ width:12px; height:12px; }
+    .action-row{ flex-direction: column; }
     .download-all-btn{ width:100%; justify-content:center; padding: 13px; }
     .detail-info{ padding: 14px; }
     .lightbox-nav{ width:40px; height:40px; }
@@ -301,6 +318,9 @@
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2"><path d="M9 18l6-6-6-6"/></svg>
   </button>
   <div class="lightbox-counter" id="lightbox-counter"></div>
+  <button class="lightbox-copy" id="lightbox-copy-btn" onclick="lightboxCopyLink(event)" title="링크 복사">
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+  </button>
   <button class="lightbox-download" id="lightbox-dl-btn" onclick="lightboxDownload(event)" title="다운로드">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2"><path d="M12 3v12"/><path d="M6 11l6 6 6-6"/><path d="M5 21h14"/></svg>
   </button>
@@ -386,6 +406,9 @@
     const photoHtml = obj.photos.map((url, i) => `
       <div class="photo-wrap">
         <img src="${url}" loading="lazy" onclick="openLightbox(${i})">
+        <button class="copy-btn" onclick="copyLink('${url}', this)" title="링크 복사">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        </button>
         <button class="download-btn" onclick="downloadPhoto('${url}', ${i}, this)" title="다운로드">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2"><path d="M12 3v12"/><path d="M6 11l6 6 6-6"/><path d="M5 21h14"/></svg>
         </button>
@@ -397,10 +420,16 @@
 
     main.innerHTML = `
       <div class="photo-grid">${photoHtml}</div>
-      <button class="download-all-btn" onclick="downloadAll()">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 3v12"/><path d="M6 11l6 6 6-6"/><path d="M5 21h14"/></svg>
-        전체 ${obj.photos.length}장 다운로드
-      </button>
+      <div class="action-row">
+        <button class="download-all-btn secondary" onclick="copyAllLinks()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          전체 링크 복사
+        </button>
+        <button class="download-all-btn" onclick="downloadAll()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 3v12"/><path d="M6 11l6 6 6-6"/><path d="M5 21h14"/></svg>
+          전체 ${obj.photos.length}장 다운로드
+        </button>
+      </div>
       <div class="detail-info">${infoHtml}</div>
     `;
   }
@@ -442,6 +471,56 @@
     e.stopPropagation();
     const photos = MANIFEST[state.brand][state.part].photos;
     downloadPhoto(photos[lightboxIndex], lightboxIndex, document.getElementById('lightbox-dl-btn'));
+  }
+
+  // 클립보드 복사 (구형 브라우저/HTTP 환경 대비 fallback 포함)
+  async function copyToClipboard(text){
+    try {
+      if (navigator.clipboard && window.isSecureContext){
+        await navigator.clipboard.writeText(text);
+        return true;
+      }
+    } catch(e) { /* fallback으로 진행 */ }
+    try {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.left = '-9999px';
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+      const ok = document.execCommand('copy');
+      document.body.removeChild(ta);
+      return ok;
+    } catch(e) {
+      return false;
+    }
+  }
+
+  async function copyLink(url, btnEl){
+    const ok = await copyToClipboard(url);
+    if (ok){
+      showToast('링크가 복사됐어요. 손님께 붙여넣기 해주세요.');
+      if (btnEl){
+        btnEl.classList.add('copied');
+        setTimeout(() => btnEl.classList.remove('copied'), 1200);
+      }
+    } else {
+      showToast('복사에 실패했어요. 길게 눌러서 주소를 복사해주세요.');
+    }
+  }
+
+  async function copyAllLinks(){
+    const obj = MANIFEST[state.brand][state.part];
+    const text = obj.photos.join('\n');
+    const ok = await copyToClipboard(text);
+    showToast(ok ? `${obj.photos.length}장 링크가 모두 복사됐어요.` : '복사에 실패했어요.');
+  }
+
+  function lightboxCopyLink(e){
+    e.stopPropagation();
+    const photos = MANIFEST[state.brand][state.part].photos;
+    copyLink(photos[lightboxIndex], document.getElementById('lightbox-copy-btn'));
   }
 
   document.addEventListener('keydown', (e) => {
