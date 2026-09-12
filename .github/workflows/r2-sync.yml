@@ -15,6 +15,7 @@ on:
           - upload-pending # _pending_upload/ 안의 파일들을 R2에 업로드 후 정리
           - rename-files   # rename-map.json 기준으로 R2 오브젝트 이름 변경(copy+delete)
           - set-cors       # cors-config.json을 버킷에 적용 (브라우저 fetch 다운로드 허용)
+          - compress-images # 버킷 전체 사진 리사이즈/재압축 (경로/이름 유지)
         default: list-all
       prefix:
         description: 'list-folder일 때 사용할 폴더 경로 (예: "37 57 높이 17 수퍼 돈전지 3pc/")'
@@ -118,6 +119,22 @@ jobs:
           echo "테스트 URL: $TESTURL" >> cors-result.json
           curl -s -I -H "Origin: https://jeruhe2-sketch.github.io" "$TESTURL" >> cors-result.json
           cat cors-result.json
+
+      - name: Pillow 설치
+        if: ${{ github.event.inputs.action == 'compress-images' }}
+        run: pip install Pillow --quiet
+
+      - name: 버킷 이미지 전체 압축/리사이즈
+        if: ${{ github.event.inputs.action == 'compress-images' }}
+        run: |
+          python3 scripts/compress_r2.py
+          aws s3api list-objects-v2 \
+            --bucket livestock-library \
+            --endpoint-url ${{ secrets.R2_ENDPOINT }} \
+            --profile r2 \
+            --output json > r2-inventory.json
+        env:
+          R2_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
 
       - name: 결과 커밋
         run: |
