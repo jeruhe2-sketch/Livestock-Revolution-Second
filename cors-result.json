@@ -2,3 +2,18 @@
 {"success":true,"errors":[],"messages":[],"result":{}}
 === 확인용 GET 결과 ===
 {"success":true,"errors":[],"messages":[],"result":{"rules":[{"allowed":{"origins":["*"],"methods":["GET","HEAD"]}}]}}
+=== 실제 오브젝트 응답 헤더 (Origin 헤더 넣어서 요청) ===
+테스트 URL: https://pub-4a7975ff76ef42ed80c2fcfed0ae169e.r2.dev/SEARA/%EC%A0%84%EC%A7%80/SEARA_%EC%A0%84%EC%A7%80_HLCUIT1251021138_1.jpg
+HTTP/1.1 200 OK
+Date: Sat, 12 Sep 2026 12:11:57 GMT
+Content-Type: image/jpeg
+Content-Length: 3293798
+Connection: keep-alive
+Accept-Ranges: bytes
+Access-Control-Allow-Origin: *
+ETag: "0a1ea2ba3ba06a85b43a7c296ca23405"
+Last-Modified: Sat, 12 Sep 2026 04:27:11 GMT
+Vary: Origin
+Server: cloudflare
+CF-RAY: a39ed152cae7f85d-ORD
+
