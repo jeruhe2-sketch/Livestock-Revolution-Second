@@ -230,7 +230,8 @@
     box-shadow: 0 20px 60px rgba(0,0,0,0.5);
     user-select:none;
     -webkit-user-drag:none;
-    pointer-events:none;
+    touch-action: pan-x;
+    will-change: transform;
   }
   .lightbox-close{
     position:absolute; top:max(14px, env(safe-area-inset-top)); right:14px;
@@ -271,6 +272,20 @@
     max-width: 88vw; text-align:center;
   }
   .toast.show{ opacity:1; }
+
+  /* 화면 전환 애니메이션 (지원 브라우저에서만 동작, 미지원시 그냥 즉시 전환) */
+  ::view-transition-old(root){
+    animation: fade-slide-out .16s ease both;
+  }
+  ::view-transition-new(root){
+    animation: fade-slide-in .18s ease both;
+  }
+  @keyframes fade-slide-out{
+    to{ opacity:0; transform: translateX(-8px); }
+  }
+  @keyframes fade-slide-in{
+    from{ opacity:0; transform: translateX(8px); }
+  }
 
   /* 모바일 */
   @media (max-width: 640px){
@@ -408,6 +423,14 @@
   }
 
   function render(){
+    if (document.startViewTransition){
+      document.startViewTransition(() => renderInner());
+    } else {
+      renderInner();
+    }
+  }
+
+  function renderInner(){
     renderBreadcrumb();
     const main = document.getElementById('main');
     const brands = Object.keys(MANIFEST);
@@ -477,7 +500,7 @@
     const photos = MANIFEST[state.brand][state.part].photos;
     const scrollEl = document.getElementById('lightbox-scroll');
     scrollEl.innerHTML = photos.map((url, idx) => `
-      <div class="lightbox-slide"><img src="${url}" alt=""></div>
+      <div class="lightbox-slide"><img src="${url}" alt="" draggable="false"></div>
     `).join('');
     updateLightboxCounter();
     document.getElementById('lightbox').classList.add('open');
@@ -488,6 +511,7 @@
       scrollEl.scrollTo({ left: i * scrollEl.clientWidth, behavior: 'instant' });
       setTimeout(() => { lightboxScrolling = false; }, 50);
     });
+    initZoomHandlers(scrollEl);
   }
 
   function closeLightbox(){
@@ -500,9 +524,18 @@
     document.getElementById('lightbox-counter').textContent = `${lightboxIndex+1} / ${photos.length}`;
   }
 
-  // 스크롤(스와이프)이 멈추면 현재 위치에 맞는 인덱스로 갱신
+  function resetAllZoom(scrollEl){
+    scrollEl.querySelectorAll('img').forEach(img => {
+      img.style.transform = 'translate(0px, 0px) scale(1)';
+      img.dataset.scale = 1;
+      img.dataset.tx = 0;
+      img.dataset.ty = 0;
+      img.style.touchAction = 'pan-x';
+    });
+  }
+
+  // 스크롤(스와이프)이 멈추면 현재 위치에 맞는 인덱스로 갱신 + 확대 상태 초기화
   let scrollEndTimer = null;
-  document.addEventListener('DOMContentLoaded', () => {}); // no-op, 초기화는 아래 초기 바인딩에서 처리
   function bindLightboxScroll(){
     const scrollEl = document.getElementById('lightbox-scroll');
     scrollEl.addEventListener('scroll', () => {
@@ -513,9 +546,106 @@
         if (idx !== lightboxIndex){
           lightboxIndex = idx;
           updateLightboxCounter();
+          resetAllZoom(scrollEl);
         }
       }, 100);
     }, { passive: true });
+  }
+
+  // 핀치줌 / 더블탭 확대 / 드래그 이동 (인스타그램 스타일)
+  function initZoomHandlers(scrollEl){
+    const MAX_SCALE = 4;
+    const pointers = new Map();
+    let pinchStartDist = 0, pinchStartScale = 1;
+    let panStart = null;
+    let lastTapTime = 0, lastTapImg = null;
+
+    function getImg(target){
+      return target && target.tagName === 'IMG' ? target : null;
+    }
+    function dist(pts){
+      const [a,b] = pts;
+      return Math.hypot(a.x-b.x, a.y-b.y);
+    }
+    function applyTransform(img){
+      img.style.transform = `translate(${img.dataset.tx}px, ${img.dataset.ty}px) scale(${img.dataset.scale})`;
+    }
+    function clampPan(img, scale){
+      const rect = img.getBoundingClientRect();
+      const parentRect = img.parentElement.getBoundingClientRect();
+      const maxX = Math.max(0, (rect.width * scale - parentRect.width) / 2);
+      const maxY = Math.max(0, (rect.height * scale - parentRect.height) / 2);
+      img.dataset.tx = Math.min(maxX, Math.max(-maxX, parseFloat(img.dataset.tx)));
+      img.dataset.ty = Math.min(maxY, Math.max(-maxY, parseFloat(img.dataset.ty)));
+    }
+
+    scrollEl.addEventListener('pointerdown', (e) => {
+      const img = getImg(e.target);
+      if (!img) return;
+      pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      img.setPointerCapture(e.pointerId);
+
+      if (pointers.size === 1){
+        const now = Date.now();
+        if (lastTapImg === img && now - lastTapTime < 300){
+          // 더블탭: 1x <-> 2.5x 토글
+          const cur = parseFloat(img.dataset.scale || 1);
+          if (cur > 1){
+            img.dataset.scale = 1; img.dataset.tx = 0; img.dataset.ty = 0;
+            img.style.touchAction = 'pan-x';
+          } else {
+            img.dataset.scale = 2.5;
+            img.style.touchAction = 'none';
+          }
+          applyTransform(img);
+          lastTapTime = 0;
+        } else {
+          lastTapTime = now;
+          lastTapImg = img;
+          if (parseFloat(img.dataset.scale || 1) > 1){
+            panStart = { x: e.clientX, y: e.clientY, tx: parseFloat(img.dataset.tx||0), ty: parseFloat(img.dataset.ty||0), img };
+          }
+        }
+      } else if (pointers.size === 2){
+        const pts = Array.from(pointers.values());
+        pinchStartDist = dist(pts);
+        pinchStartScale = parseFloat(img.dataset.scale || 1);
+        panStart = null;
+      }
+    });
+
+    scrollEl.addEventListener('pointermove', (e) => {
+      if (!pointers.has(e.pointerId)) return;
+      pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      const img = getImg(e.target) || lastTapImg;
+      if (!img) return;
+
+      if (pointers.size === 2 && pinchStartDist > 0){
+        const pts = Array.from(pointers.values());
+        const newDist = dist(pts);
+        let scale = pinchStartScale * (newDist / pinchStartDist);
+        scale = Math.min(MAX_SCALE, Math.max(1, scale));
+        img.dataset.scale = scale;
+        img.style.touchAction = scale > 1 ? 'none' : 'pan-x';
+        clampPan(img, scale);
+        applyTransform(img);
+      } else if (pointers.size === 1 && panStart && panStart.img === img){
+        const dx = e.clientX - panStart.x;
+        const dy = e.clientY - panStart.y;
+        img.dataset.tx = panStart.tx + dx;
+        img.dataset.ty = panStart.ty + dy;
+        clampPan(img, parseFloat(img.dataset.scale || 1));
+        applyTransform(img);
+      }
+    });
+
+    function endPointer(e){
+      pointers.delete(e.pointerId);
+      if (pointers.size < 2) pinchStartDist = 0;
+      if (pointers.size === 0) panStart = null;
+    }
+    scrollEl.addEventListener('pointerup', endPointer);
+    scrollEl.addEventListener('pointercancel', endPointer);
   }
 
   function lightboxDownload(e){
