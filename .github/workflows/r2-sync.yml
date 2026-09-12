@@ -90,19 +90,27 @@ jobs:
         env:
           R2_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
 
-      - name: R2 버킷 CORS 설정
+      - name: R2 버킷 CORS 설정 (Cloudflare REST API)
         if: ${{ github.event.inputs.action == 'set-cors' }}
         run: |
-          aws s3api put-bucket-cors \
-            --bucket livestock-library \
-            --cors-configuration file://cors-config.json \
-            --endpoint-url ${{ secrets.R2_ENDPOINT }} \
-            --profile r2
-          echo "적용된 CORS 설정 확인:"
-          aws s3api get-bucket-cors \
-            --bucket livestock-library \
-            --endpoint-url ${{ secrets.R2_ENDPOINT }} \
-            --profile r2
+          curl -s -X PUT \
+            "https://api.cloudflare.com/client/v4/accounts/${{ secrets.CF_ACCOUNT_ID }}/r2/buckets/livestock-library/cors" \
+            -H "Authorization: Bearer ${{ secrets.CF_API_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "rules": [
+                {
+                  "allowed": {
+                    "origins": ["*"],
+                    "methods": ["GET", "HEAD"]
+                  }
+                }
+              ]
+            }' | tee cors-result.json
+          echo ""
+          echo "--- 확인 ---"
+          curl -s "https://api.cloudflare.com/client/v4/accounts/${{ secrets.CF_ACCOUNT_ID }}/r2/buckets/livestock-library/cors" \
+            -H "Authorization: Bearer ${{ secrets.CF_API_TOKEN }}"
 
       - name: 결과 커밋
         run: |
