@@ -14,6 +14,7 @@ on:
           - list-folder    # 특정 폴더(prefix) 목록만 저장
           - upload-pending # _pending_upload/ 안의 파일들을 R2에 업로드 후 정리
           - rename-files   # rename-map.json 기준으로 R2 오브젝트 이름 변경(copy+delete)
+          - set-cors       # cors-config.json을 버킷에 적용 (브라우저 fetch 다운로드 허용)
         default: list-all
       prefix:
         description: 'list-folder일 때 사용할 폴더 경로 (예: "37 57 높이 17 수퍼 돈전지 3pc/")'
@@ -88,6 +89,20 @@ jobs:
             --output json > r2-inventory.json
         env:
           R2_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
+
+      - name: R2 버킷 CORS 설정
+        if: ${{ github.event.inputs.action == 'set-cors' }}
+        run: |
+          aws s3api put-bucket-cors \
+            --bucket livestock-library \
+            --cors-configuration file://cors-config.json \
+            --endpoint-url ${{ secrets.R2_ENDPOINT }} \
+            --profile r2
+          echo "적용된 CORS 설정 확인:"
+          aws s3api get-bucket-cors \
+            --bucket livestock-library \
+            --endpoint-url ${{ secrets.R2_ENDPOINT }} \
+            --profile r2
 
       - name: 결과 커밋
         run: |
