@@ -532,11 +532,15 @@
       const res = await fetch(bustUrl, { cache: 'no-store' });
       if (!res.ok) throw new Error('fetch 실패: ' + res.status);
       const blob = await res.blob();
-      const ext = (url.split('.').pop().split('?')[0] || 'jpg').slice(0,4);
       const blobUrl = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = blobUrl;
-      a.download = `${state.brand}_${state.part}_${String(i+1).padStart(2,'0')}.${ext}`;
+      // 매번 고유한 파일명으로 저장 (같은 이름 재다운로드 시 뜨는 확인창 자체를 방지)
+      const originalName = decodeURIComponent(url.split('/').pop().split('?')[0]);
+      const dot = originalName.lastIndexOf('.');
+      const base = dot > -1 ? originalName.slice(0, dot) : originalName;
+      const extPart = dot > -1 ? originalName.slice(dot) : '';
+      a.download = `${base}_${Date.now()}${extPart}`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
