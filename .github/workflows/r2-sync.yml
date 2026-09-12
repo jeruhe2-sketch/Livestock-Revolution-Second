@@ -1,0 +1,64 @@
+name: R2 Sync Tool
+
+# Claude가 GitHub API로 이 워크플로우를 원격 실행시켜서
+# 이 세션 자체는 접근 못 하는 Cloudflare R2 API를 대신 호출하게 하는 중계 워크플로우.
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: '실행할 작업'
+        required: true
+        type: choice
+        options:
+          - list-all       # 버킷 전체 오브젝트 목록을 JSON으로 저장
+          - list-folder    # 특정 폴더(prefix) 목록만 저장
+        default: list-all
+      prefix:
+        description: 'list-folder일 때 사용할 폴더 경로 (예: "37 57 높이 17 수퍼 돈전지 3pc/")'
+        required: false
+        default: ''
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 체크아웃
+        uses: actions/checkout@v4
+
+      - name: AWS CLI로 R2(S3 호환) 접근 설정
+        run: |
+          mkdir -p ~/.aws
+          cat > ~/.aws/credentials << EOF
+          [r2]
+          aws_access_key_id = ${{ secrets.R2_ACCESS_KEY_ID }}
+          aws_secret_access_key = ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          EOF
+
+      - name: 버킷 전체 목록 조회
+        if: ${{ github.event.inputs.action == 'list-all' }}
+        run: |
+          aws s3api list-objects-v2 \
+            --bucket livestock-library \
+            --endpoint-url ${{ secrets.R2_ENDPOINT }} \
+            --profile r2 \
+            --output json > r2-inventory.json
+          echo "총 오브젝트 개수:"
+          python3 -c "import json; d=json.load(open('r2-inventory.json')); print(len(d.get('Contents', [])))"
+
+      - name: 특정 폴더 목록 조회
+        if: ${{ github.event.inputs.action == 'list-folder' }}
+        run: |
+          aws s3api list-objects-v2 \
+            --bucket livestock-library \
+            --prefix "${{ github.event.inputs.prefix }}" \
+            --endpoint-url ${{ secrets.R2_ENDPOINT }} \
+            --profile r2 \
+            --output json > r2-inventory.json
+
+      - name: 결과 커밋
+        run: |
+          git config user.name "R2 Sync Bot"
+          git config user.email "actions@github.com"
+          git add r2-inventory.json
+          git diff --cached --quiet || git commit -m "R2 인벤토리 갱신 ($(date -u +%Y-%m-%dT%H:%M:%SZ))"
+          git push
