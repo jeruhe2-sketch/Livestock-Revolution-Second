@@ -323,16 +323,38 @@
       console.error('로드 실패', e);
       MANIFEST = {};
     }
+    applyHash();
     render();
   }
 
-  function goHome(){ state = { brand: null, part: null }; render(); }
-  function goBrand(b){ state = { brand: b, part: null }; render(); }
-  function goPart(b, p){ state = { brand: b, part: p }; render(); }
+  function updateHash(){
+    if (state.brand && state.part){
+      history.replaceState(null, '', `#${encodeURIComponent(state.brand)}/${encodeURIComponent(state.part)}`);
+    } else if (state.brand){
+      history.replaceState(null, '', `#${encodeURIComponent(state.brand)}`);
+    } else {
+      history.replaceState(null, '', location.pathname + location.search);
+    }
+  }
+
+  function applyHash(){
+    const hash = decodeURIComponent(location.hash.replace(/^#/, ''));
+    if (!hash) return;
+    const [b, p] = hash.split('/');
+    if (b && MANIFEST[b]){
+      state.brand = b;
+      if (p && MANIFEST[b][p]) state.part = p;
+    }
+  }
+
+  function goHome(){ state = { brand: null, part: null }; updateHash(); render(); }
+  function goBrand(b){ state = { brand: b, part: null }; updateHash(); render(); }
+  function goPart(b, p){ state = { brand: b, part: p }; updateHash(); render(); }
 
   function goBack(){
     if (state.part){ state.part = null; }
     else if (state.brand){ state.brand = null; }
+    updateHash();
     render();
   }
 
