@@ -16,6 +16,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="축산라이브러리">
 <meta name="format-detection" content="telephone=no">
+<link rel="preconnect" href="https://pub-4a7975ff76ef42ed80c2fcfed0ae169e.r2.dev" crossorigin>
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
 <style>
@@ -317,6 +318,22 @@
 
 <script>
   let MANIFEST = {};
+
+  // 원본 URL(예: https://.../r2.dev/AGROSUPER/전지/xxx.png)을
+  // 썸네일 URL(https://.../r2.dev/thumbs/AGROSUPER/전지/xxx.jpg)로 변환
+  function toThumbUrl(url){
+    const marker = 'r2.dev/';
+    const idx = url.indexOf(marker);
+    if (idx === -1) return url;
+    const head = url.slice(0, idx + marker.length);
+    let rest = url.slice(idx + marker.length);
+    const qIdx = rest.indexOf('?');
+    const query = qIdx > -1 ? rest.slice(qIdx) : '';
+    if (qIdx > -1) rest = rest.slice(0, qIdx);
+    const dot = rest.lastIndexOf('.');
+    const withoutExt = dot > -1 ? rest.slice(0, dot) : rest;
+    return `${head}thumbs/${withoutExt}.jpg${query}`;
+  }
   let state = { brand: null, part: null };
 
   async function loadData(){
@@ -414,7 +431,7 @@
     const obj = MANIFEST[state.brand][state.part];
     const photoHtml = obj.photos.map((url, i) => `
       <div class="photo-wrap">
-        <img src="${url}" loading="lazy" onclick="openLightbox(${i})">
+        <img src="${toThumbUrl(url)}" onclick="openLightbox(${i})">
         <button class="download-btn" onclick="downloadPhoto('${url}', ${i}, this)" title="다운로드">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2"><path d="M12 3v12"/><path d="M6 11l6 6 6-6"/><path d="M5 21h14"/></svg>
         </button>
