@@ -80,22 +80,7 @@ jobs:
       - name: R2 오브젝트 이름 변경 (rename-map.json 기준)
         if: ${{ github.event.inputs.action == 'rename-files' }}
         run: |
-          python3 << 'PYEOF'
-          import json, subprocess, os
-          m = json.load(open('rename-map.json'))
-          endpoint = os.environ['R2_ENDPOINT']
-          for item in m['renames']:
-              src = item['from']
-              dst = item['to']
-              print(f"이동: {src} -> {dst}")
-              subprocess.run([
-                  "aws", "s3", "mv",
-                  f"s3://livestock-library/{src}",
-                  f"s3://livestock-library/{dst}",
-                  "--endpoint-url", endpoint,
-                  "--profile", "r2"
-              ], check=True)
-          PYEOF
+          python3 scripts/rename_r2.py
           aws s3api list-objects-v2 \
             --bucket livestock-library \
             --endpoint-url ${{ secrets.R2_ENDPOINT }} \
