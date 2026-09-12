@@ -651,6 +651,8 @@
         pinchStartDist = dist(pts);
         pinchStartScale = parseFloat(img.dataset.scale || 1);
         panStart = null;
+        img.style.touchAction = 'none'; // 핀치 시작 즉시 브라우저 기본 확대와 충돌 방지
+        e.preventDefault();
       }
     });
 
