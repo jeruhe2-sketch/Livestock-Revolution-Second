@@ -296,6 +296,8 @@
     scrollbar-width: none;
   }
   .lightbox-scroll::-webkit-scrollbar{ display:none; }
+  .lightbox-scroll{ cursor: grab; }
+  .lightbox-scroll.dragging{ cursor: grabbing; }
   .lightbox-slide{
     flex: 0 0 100%;
     width:100%; height:100%;
@@ -731,12 +733,14 @@
   }
 
   // 핀치줌 / 더블탭 확대 / 드래그 이동 (인스타그램 스타일)
+  // + 데스크톱(마우스/트랙패드) 지원: 마우스 드래그로 스와이프, 휠로 넘기기, Ctrl+휠/트랙패드 핀치로 확대
   function initZoomHandlers(scrollEl){
     const MAX_SCALE = 4;
     const pointers = new Map();
     let pinchStartDist = 0, pinchStartScale = 1;
     let panStart = null;
     let lastTapTime = 0, lastTapImg = null;
+    let mouseDrag = null; // 마우스로 스와이프(확대 안 된 상태에서 좌우 넘기기)
 
     function getImg(target){
       return target && target.tagName === 'IMG' ? target : null;
@@ -756,6 +760,18 @@
       img.dataset.tx = Math.min(maxX, Math.max(-maxX, parseFloat(img.dataset.tx)));
       img.dataset.ty = Math.min(maxY, Math.max(-maxY, parseFloat(img.dataset.ty)));
     }
+    function currentSlideImg(){
+      const idx = Math.round(scrollEl.scrollLeft / scrollEl.clientWidth);
+      return scrollEl.querySelectorAll('.lightbox-slide img')[idx];
+    }
+    function zoomImgBy(img, delta){
+      let scale = parseFloat(img.dataset.scale || 1) + delta;
+      scale = Math.min(MAX_SCALE, Math.max(1, scale));
+      img.dataset.scale = scale;
+      img.style.touchAction = scale > 1 ? 'none' : 'pan-x';
+      clampPan(img, scale);
+      applyTransform(img);
+    }
 
     scrollEl.addEventListener('pointerdown', (e) => {
       const img = getImg(e.target);
@@ -766,7 +782,7 @@
       if (pointers.size === 1){
         const now = Date.now();
         if (lastTapImg === img && now - lastTapTime < 300){
-          // 더블탭: 1x <-> 2.5x 토글
+          // 더블탭/더블클릭: 1x <-> 2.5x 토글
           const cur = parseFloat(img.dataset.scale || 1);
           if (cur > 1){
             img.dataset.scale = 1; img.dataset.tx = 0; img.dataset.ty = 0;
@@ -783,6 +799,11 @@
           lastTapImg = img;
           if (parseFloat(img.dataset.scale || 1) > 1){
             panStart = { x: e.clientX, y: e.clientY, tx: parseFloat(img.dataset.tx||0), ty: parseFloat(img.dataset.ty||0), img };
+          } else if (e.pointerType === 'mouse'){
+            // 확대 안 된 상태에서 마우스 클릭+드래그 = 좌우 스와이프 (인스타그램 웹처럼)
+            mouseDrag = { startX: e.clientX, startScroll: scrollEl.scrollLeft, moved: false };
+            scrollEl.classList.add('dragging');
+            scrollEl.style.scrollSnapType = 'none'; // 드래그 중엔 스냅이 scrollLeft 대입을 즉시 되돌리므로 잠깐 꺼둠
           }
         }
       } else if (pointers.size === 2){
@@ -796,6 +817,12 @@
     });
 
     scrollEl.addEventListener('pointermove', (e) => {
+      if (mouseDrag){
+        const dx = e.clientX - mouseDrag.startX;
+        if (Math.abs(dx) > 3) mouseDrag.moved = true;
+        scrollEl.scrollLeft = mouseDrag.startScroll - dx;
+        return;
+      }
       if (!pointers.has(e.pointerId)) return;
       pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
       const img = getImg(e.target) || lastTapImg;
@@ -824,9 +851,44 @@
       pointers.delete(e.pointerId);
       if (pointers.size < 2) pinchStartDist = 0;
       if (pointers.size === 0) panStart = null;
+      if (mouseDrag){
+        scrollEl.classList.remove('dragging');
+        // 놓으면 가장 가까운 사진으로 스냅
+        const idx = Math.round(scrollEl.scrollLeft / scrollEl.clientWidth);
+        scrollEl.scrollTo({ left: idx * scrollEl.clientWidth, behavior: 'smooth' });
+        scrollEl.style.scrollSnapType = ''; // 스냅 복원
+        mouseDrag = null;
+      }
     }
     scrollEl.addEventListener('pointerup', endPointer);
     scrollEl.addEventListener('pointercancel', endPointer);
+
+    // 데스크톱 휠 지원: Ctrl+휠 또는 트랙패드 핀치 제스처(ctrlKey 자동 부여) = 확대/축소,
+    // 일반 휠(세로 스크롤)은 좌우 넘기기로 변환 (마우스만 있어도 사진첩 넘기듯 스크롤 가능)
+    let wheelSnapTimer = null;
+    scrollEl.addEventListener('wheel', (e) => {
+      if (e.ctrlKey){
+        e.preventDefault();
+        const img = currentSlideImg();
+        if (img) zoomImgBy(img, -e.deltaY * 0.015);
+        return;
+      }
+      if (Math.abs(e.deltaY) > Math.abs(e.deltaX)){
+        const img = currentSlideImg();
+        if (img && parseFloat(img.dataset.scale || 1) > 1) return; // 확대 중엔 넘기기 대신 이미지 팬 유지
+        e.preventDefault();
+        // scroll-snap이 켜진 채로 scrollLeft를 직접 대입하면 매번 즉시 스냅되어 버리므로
+        // 휠이 연속으로 들어오는 동안은 스냅을 잠깐 끄고, 멈추면 가장 가까운 사진으로 스냅 복원
+        scrollEl.style.scrollSnapType = 'none';
+        clearTimeout(wheelSnapTimer);
+        scrollEl.scrollLeft += e.deltaY;
+        wheelSnapTimer = setTimeout(() => {
+          const idx = Math.round(scrollEl.scrollLeft / scrollEl.clientWidth);
+          scrollEl.scrollTo({ left: idx * scrollEl.clientWidth, behavior: 'smooth' });
+          scrollEl.style.scrollSnapType = '';
+        }, 140);
+      }
+    }, { passive: false });
   }
 
   function lightboxDownload(e){
