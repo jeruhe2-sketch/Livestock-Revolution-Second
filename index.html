@@ -32,7 +32,7 @@
   *{box-sizing:border-box; -webkit-tap-highlight-color: transparent;}
   button{ -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
   button:active{ transform: scale(0.94); }
-  .brand-card:active, .part-card:active{ transform: scale(0.98); }
+  .select-card:active{ transform: scale(0.97); }
   body{
     margin:0;
     background:var(--bg);
@@ -98,6 +98,21 @@
   }
   .breadcrumb .crumb{ cursor:pointer; color: var(--cold); }
   .breadcrumb .crumb:hover{ text-decoration: underline; }
+
+  /* 층 구분용 브레드크럼 (main 영역 최상단) */
+  .page-breadcrumb{
+    display:flex;
+    align-items:center;
+    flex-wrap: wrap;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--sub);
+    margin-bottom: 14px;
+  }
+  .page-breadcrumb .crumb{ cursor:pointer; color: var(--cold); font-weight:600; }
+  .page-breadcrumb .crumb:hover{ text-decoration: underline; }
+  .page-breadcrumb .sep{ color: var(--line); }
+  .page-breadcrumb .current{ font-weight:800; color: var(--ink); }
   .back-btn{
     display:inline-flex;
     align-items:center;
@@ -149,31 +164,57 @@
   .action-row .download-all-btn{ margin-top: 12px; }
 
   main{ padding: 16px 20px 60px; max-width: 1000px; margin: 0 auto; }
+  .header-inner{ max-width: 1000px; margin: 0 auto; }
 
-  /* 브랜드 목록 */
-  .brand-grid{
+  /* 브랜드/부위 선택 카드 (층 구분 화면 공용) */
+  .select-grid{
     display:grid;
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    gap: 12px;
-    margin-top: 16px;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 14px;
   }
-  .brand-card{
+  .select-card{
     background: var(--card);
     border: 1px solid var(--line);
-    border-radius: 12px;
-    padding: 20px 12px;
-    text-align: center;
+    border-radius: 14px;
+    overflow: hidden;
     cursor: pointer;
-    font-weight: 700;
-    font-size: 15px;
+    transition: transform .12s ease, border-color .12s ease, box-shadow .12s ease;
   }
-  .brand-card:hover{ border-color: var(--accent); color: var(--accent); }
-  .brand-card .count{
-    display:block;
-    font-size: 11px;
+  .select-card:hover{ border-color: var(--accent); box-shadow: 0 6px 18px rgba(22,32,28,0.07); transform: translateY(-2px); }
+  .select-card .thumb{
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    background: linear-gradient(90deg, var(--line) 25%, #e4e9e5 37%, var(--line) 63%);
+    background-size: 400px 100%;
+    animation: shimmer 1.3s ease-in-out infinite;
+    overflow: hidden;
+  }
+  .select-card .thumb.loaded{ animation: none; background: var(--bg); }
+  .select-card .thumb img{
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+    opacity: 0;
+    transition: opacity .25s ease;
+  }
+  .select-card .thumb img.loaded{ opacity: 1; }
+  .select-card .thumb .badge{
+    position: absolute;
+    bottom: 6px; right: 6px;
+    background: rgba(10,14,12,0.62);
+    color: #fff;
+    font-size: 10.5px;
+    font-family: ui-monospace,monospace;
+    padding: 3px 8px;
+    border-radius: 20px;
+  }
+  .select-card .body{ padding: 10px 12px 12px; }
+  .select-card .name{ font-weight: 800; font-size: 15px; line-height:1.3; }
+  .select-card .sub{
+    font-size: 11.5px;
     color: var(--sub);
-    font-weight: 400;
-    margin-top: 4px;
+    margin-top: 3px;
     font-family: ui-monospace,monospace;
   }
 
@@ -194,22 +235,6 @@
     animation: shimmer 1.3s ease-in-out infinite;
     border-radius: 10px;
   }
-
-  /* 부위 목록 */
-  .part-list{ margin-top: 16px; display:flex; flex-direction:column; gap:10px; }
-  .part-card{
-    background: var(--card);
-    border: 1px solid var(--line);
-    border-radius: 12px;
-    padding: 14px 16px;
-    cursor: pointer;
-    display:flex;
-    justify-content: space-between;
-    align-items:center;
-  }
-  .part-card:hover{ border-color: var(--accent); }
-  .part-card .name{ font-weight: 700; font-size: 15px; }
-  .part-card .photo-count{ font-size: 12px; color: var(--sub); font-family: ui-monospace,monospace; }
 
   /* 상세 화면 */
   .detail-info{
@@ -345,6 +370,11 @@
     header{ padding: 16px 14px; }
     .brand-row h1{ font-size: 17px; }
     main{ padding: 12px 14px 40px; }
+    .select-grid{ grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .select-card .name{ font-size: 13.5px; }
+    .select-card .sub{ font-size: 10.5px; }
+    .select-card .body{ padding: 8px 10px 10px; }
+    .page-breadcrumb{ font-size: 12px; margin-bottom: 10px; }
     .photo-grid{ grid-template-columns: repeat(3, 1fr); gap:6px; }
     .photo-wrap img{ height: 108px; border-radius: 7px; }
     .download-btn{ width: 26px; height: 26px; bottom:5px; right:5px; }
@@ -353,21 +383,41 @@
     .download-all-btn{ width:100%; justify-content:center; padding: 13px; }
     .detail-info{ padding: 14px; }
   }
+
+  /* 넓은 데스크톱: 여백/카드 크기를 화면에 맞게 확장 */
+  @media (min-width: 1024px){
+    main{ max-width: 1160px; padding: 24px 32px 72px; }
+    .header-inner{ max-width: 1160px; }
+    header{ padding: 22px 32px; }
+    .select-grid{ grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 18px; }
+    .photo-grid{ grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 14px; }
+    .photo-wrap img{ height: 190px; border-radius: 12px; }
+    .chip{ padding: 8px 16px; font-size: 13.5px; }
+    .chip:hover{ border-color: var(--cold); }
+  }
+
+  /* 아주 넓은 화면(대형 모니터)에서 카드가 과도하게 커지지 않도록 */
+  @media (min-width: 1440px){
+    main{ max-width: 1320px; }
+    .header-inner{ max-width: 1320px; }
+  }
 </style>
 </head>
 <body>
 
 <header>
-  <div class="brand-row" onclick="goHome()">
-    <h1>축산 라이브러리</h1>
-    <span>PHOTO ARCHIVE</span>
+  <div class="header-inner">
+    <div class="brand-row" onclick="goHome()">
+      <h1>축산 라이브러리</h1>
+      <span>PHOTO ARCHIVE</span>
+    </div>
+    <div class="chip-row" id="brand-chips">
+      <div class="skeleton-card" style="width:70px;height:30px;border-radius:20px;flex-shrink:0;"></div>
+      <div class="skeleton-card" style="width:90px;height:30px;border-radius:20px;flex-shrink:0;"></div>
+      <div class="skeleton-card" style="width:60px;height:30px;border-radius:20px;flex-shrink:0;"></div>
+    </div>
+    <div class="chip-row part-chip-row hidden" id="part-chips"></div>
   </div>
-  <div class="chip-row" id="brand-chips">
-    <div class="skeleton-card" style="width:70px;height:30px;border-radius:20px;flex-shrink:0;"></div>
-    <div class="skeleton-card" style="width:90px;height:30px;border-radius:20px;flex-shrink:0;"></div>
-    <div class="skeleton-card" style="width:60px;height:30px;border-radius:20px;flex-shrink:0;"></div>
-  </div>
-  <div class="chip-row part-chip-row hidden" id="part-chips"></div>
 </header>
 
 <main id="main"></main>
@@ -404,6 +454,29 @@
     return `${head}thumbs/${withoutExt}.jpg${query}`;
   }
   let state = { brand: null, part: null };
+
+  // 브랜드 카드용: 부위 개수/전체 사진 장수/대표 썸네일
+  function brandPhotoCount(b){
+    return Object.values(MANIFEST[b]).reduce((sum, part) => sum + part.photos.length, 0);
+  }
+  function brandThumbUrl(b){
+    const parts = MANIFEST[b];
+    for (const p of Object.keys(parts)){
+      if (parts[p].photos && parts[p].photos.length) return toThumbUrl(parts[p].photos[0]);
+    }
+    return '';
+  }
+  function partThumbUrl(b, p){
+    const photos = MANIFEST[b][p].photos;
+    return (photos && photos.length) ? toThumbUrl(photos[0]) : '';
+  }
+  // 카드/그리드 썸네일 공통 마크업 (로딩 스켈레톤 -> 페이드인)
+  function thumbHtml(url, badgeText){
+    const img = url
+      ? `<img src="${url}" loading="lazy" onload="this.classList.add('loaded'); this.parentElement.classList.add('loaded')" onerror="this.parentElement.classList.add('loaded')">`
+      : '';
+    return `<div class="thumb skeleton-thumb">${img}<span class="badge">${badgeText}</span></div>`;
+  }
 
   async function loadData(){
     try {
@@ -501,17 +574,53 @@
       return;
     }
 
+    // 1층: 브랜드 선택
     if (!state.brand){
-      main.innerHTML = `<div class="empty-state">위에서 브랜드를 눌러주세요</div>`;
+      const cardsHtml = brands.map(b => {
+        const partCount = Object.keys(MANIFEST[b]).length;
+        const photoCount = brandPhotoCount(b);
+        return `
+          <div class="select-card" onclick="goBrand('${b}')">
+            ${thumbHtml(brandThumbUrl(b), `${partCount}개 부위`)}
+            <div class="body">
+              <div class="name">${b}</div>
+              <div class="sub">${photoCount}장</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+      main.innerHTML = `<div class="select-grid">${cardsHtml}</div>`;
       return;
     }
 
+    // 2층: 부위 선택
     if (!state.part){
-      main.innerHTML = `<div class="empty-state">위에서 부위를 눌러주세요</div>`;
+      const parts = MANIFEST[state.brand];
+      const cardsHtml = Object.keys(parts).map(p => {
+        const obj = parts[p];
+        return `
+          <div class="select-card" onclick="goPart('${state.brand}','${p}')">
+            ${thumbHtml(partThumbUrl(state.brand, p), `${obj.photos.length}장`)}
+            <div class="body">
+              <div class="name">${obj.displayName}</div>
+              <div class="sub">${state.brand}</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+      main.innerHTML = `
+        <div class="page-breadcrumb">
+          <button class="back-btn" onclick="goHome()">← 뒤로</button>
+          <span class="crumb" onclick="goHome()">전체</span>
+          <span class="sep">›</span>
+          <span class="current">${state.brand}</span>
+        </div>
+        <div class="select-grid">${cardsHtml}</div>
+      `;
       return;
     }
 
-    // 사진 + 정보
+    // 3층: 사진 + 정보
     const obj = MANIFEST[state.brand][state.part];
     const photoHtml = obj.photos.map((url, i) => `
       <div class="photo-wrap skeleton-thumb">
@@ -526,6 +635,14 @@
     `).join('');
 
     main.innerHTML = `
+      <div class="page-breadcrumb">
+        <button class="back-btn" onclick="goBrand('${state.brand}')">← 뒤로</button>
+        <span class="crumb" onclick="goHome()">전체</span>
+        <span class="sep">›</span>
+        <span class="crumb" onclick="goBrand('${state.brand}')">${state.brand}</span>
+        <span class="sep">›</span>
+        <span class="current">${obj.displayName}</span>
+      </div>
       <div class="photo-grid">${photoHtml}</div>
       <div class="action-row">
         <button class="download-all-btn secondary" onclick="copyPageLink(this)">
