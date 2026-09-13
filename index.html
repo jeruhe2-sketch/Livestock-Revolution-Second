@@ -343,6 +343,34 @@
   .lightbox-download.loading svg{ animation: spin .8s linear infinite; }
   @keyframes spin{ to{ transform: rotate(360deg); } }
 
+  /* 좌우 넘기기 버튼 (지마켓 상품 이미지처럼: 스크롤/드래그 대신 버튼으로 넘김)
+     모바일은 원래 터치 스와이프로 넘기므로, 버튼은 마우스/트랙패드가 있는 웹 환경에서만 노출 */
+  /* 주의: top:50%+transform:translateY(-50%) 조합은 클릭 히트테스트가 어긋나는 경우가 있어
+     transform 대신 negative margin으로 중앙 정렬한다 */
+  .lightbox-nav{
+    display: none;
+    position:absolute; top:50%; margin-top:-24px;
+    width:48px; height:48px; border-radius:50%;
+    background: rgba(255,255,255,0.14); border:none;
+    align-items:center; justify-content:center;
+    cursor:pointer; color:#fff;
+    z-index: 2;
+    transition: background .12s ease, opacity .12s ease;
+  }
+  @media (hover: hover) and (pointer: fine){
+    .lightbox-nav{ display: flex; }
+  }
+  .lightbox-nav:hover{ background: var(--accent); }
+  .lightbox-nav.disabled{ opacity: 0.25; pointer-events: none; }
+  .lightbox-prev{ left: 14px; }
+  .lightbox-next{ right: 14px; }
+  @media (min-width: 1024px){
+    .lightbox-nav{ width: 54px; height: 54px; margin-top: -27px; }
+    .lightbox-prev{ left: 24px; }
+    .lightbox-next{ right: 24px; }
+  }
+
+
   .toast{
     position: fixed; bottom: 24px; left:50%; transform: translateX(-50%);
     background: var(--ink); color:#fff; font-size:13px;
@@ -429,6 +457,12 @@
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2"><path d="M6 6l12 12M18 6L6 18"/></svg>
   </button>
   <div class="lightbox-scroll" id="lightbox-scroll" onclick="if(event.target.tagName !== 'IMG') closeLightbox()"></div>
+  <button class="lightbox-nav lightbox-prev" id="lightbox-prev-btn" onclick="event.stopPropagation(); lightboxNav(-1)" title="이전 사진">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.4"><path d="M15 18l-6-6 6-6"/></svg>
+  </button>
+  <button class="lightbox-nav lightbox-next" id="lightbox-next-btn" onclick="event.stopPropagation(); lightboxNav(1)" title="다음 사진">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.4"><path d="M9 6l6 6-6 6"/></svg>
+  </button>
   <div class="lightbox-counter" id="lightbox-counter"></div>
   <button class="lightbox-download" id="lightbox-dl-btn" onclick="lightboxDownload(event)" title="다운로드">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2"><path d="M12 3v12"/><path d="M6 11l6 6 6-6"/><path d="M5 21h14"/></svg>
@@ -671,6 +705,7 @@
       <div class="lightbox-slide"><img data-src="${url}" data-scale="1" data-tx="0" data-ty="0" alt="" draggable="false" decoding="async"></div>
     `).join('');
     updateLightboxCounter();
+    updateNavButtons();
     document.getElementById('lightbox').classList.add('open');
     document.body.style.overflow = 'hidden';
     ensureSlidesLoaded(scrollEl, i);
@@ -680,6 +715,29 @@
       scrollEl.scrollTo({ left: i * scrollEl.clientWidth, behavior: 'instant' });
       setTimeout(() => { lightboxScrolling = false; }, 50);
     });
+  }
+
+  // 좌우 넘기기 버튼 (지마켓 상품 이미지처럼 - 스크롤/드래그 감도에 기대지 않고 버튼으로 확실하게 넘김)
+  function lightboxNav(delta){
+    const photos = MANIFEST[state.brand][state.part].photos;
+    const idx = Math.max(0, Math.min(photos.length - 1, lightboxIndex + delta));
+    if (idx === lightboxIndex) return;
+    const scrollEl = document.getElementById('lightbox-scroll');
+    lightboxIndex = idx;
+    lightboxScrolling = true;
+    scrollEl.scrollTo({ left: idx * scrollEl.clientWidth, behavior: 'smooth' });
+    updateLightboxCounter();
+    updateNavButtons();
+    resetAllZoom(scrollEl);
+    ensureSlidesLoaded(scrollEl, idx);
+    clearTimeout(lightboxNav._timer);
+    lightboxNav._timer = setTimeout(() => { lightboxScrolling = false; }, 400);
+  }
+
+  function updateNavButtons(){
+    const photos = MANIFEST[state.brand][state.part].photos;
+    document.getElementById('lightbox-prev-btn').classList.toggle('disabled', lightboxIndex <= 0);
+    document.getElementById('lightbox-next-btn').classList.toggle('disabled', lightboxIndex >= photos.length - 1);
   }
 
   // 현재 인덱스와 바로 양옆 사진만 실제 로드 (전체를 한꺼번에 불러와서 버벅이는 것 방지)
@@ -725,12 +783,14 @@
         if (idx !== lightboxIndex){
           lightboxIndex = idx;
           updateLightboxCounter();
+          updateNavButtons();
           resetAllZoom(scrollEl);
         }
         ensureSlidesLoaded(scrollEl, lightboxIndex);
       }, 100);
     }, { passive: true });
   }
+
 
   // 핀치줌 / 더블탭 확대 / 드래그 이동 (인스타그램 스타일)
   // + 데스크톱(마우스/트랙패드) 지원: 마우스 드래그로 스와이프, 휠로 넘기기, Ctrl+휠/트랙패드 핀치로 확대
@@ -863,33 +923,15 @@
     scrollEl.addEventListener('pointerup', endPointer);
     scrollEl.addEventListener('pointercancel', endPointer);
 
-    // 데스크톱 휠 지원: Ctrl+휠 또는 트랙패드 핀치 제스처(ctrlKey 자동 부여) = 확대/축소,
-    // 일반 휠(세로 스크롤)은 좌우 넘기기로 변환 (마우스만 있어도 사진첩 넘기듯 스크롤 가능)
-    let wheelSnapTimer = null;
+    // 지마켓 상품 이미지처럼: 휠은 넘기기가 아니라 확대/축소 전용 (스크롤로 넘기던 방식은 감도가 뻑뻑해서 제거)
+    // 넘기기는 좌우 화살표 버튼(lightboxNav)으로 확실하게 처리
     scrollEl.addEventListener('wheel', (e) => {
-      if (e.ctrlKey){
-        e.preventDefault();
-        const img = currentSlideImg();
-        if (img) zoomImgBy(img, -e.deltaY * 0.015);
-        return;
-      }
-      if (Math.abs(e.deltaY) > Math.abs(e.deltaX)){
-        const img = currentSlideImg();
-        if (img && parseFloat(img.dataset.scale || 1) > 1) return; // 확대 중엔 넘기기 대신 이미지 팬 유지
-        e.preventDefault();
-        // scroll-snap이 켜진 채로 scrollLeft를 직접 대입하면 매번 즉시 스냅되어 버리므로
-        // 휠이 연속으로 들어오는 동안은 스냅을 잠깐 끄고, 멈추면 가장 가까운 사진으로 스냅 복원
-        scrollEl.style.scrollSnapType = 'none';
-        clearTimeout(wheelSnapTimer);
-        scrollEl.scrollLeft += e.deltaY;
-        wheelSnapTimer = setTimeout(() => {
-          const idx = Math.round(scrollEl.scrollLeft / scrollEl.clientWidth);
-          scrollEl.scrollTo({ left: idx * scrollEl.clientWidth, behavior: 'smooth' });
-          scrollEl.style.scrollSnapType = '';
-        }, 140);
-      }
+      e.preventDefault();
+      const img = currentSlideImg();
+      if (img) zoomImgBy(img, -e.deltaY * 0.015);
     }, { passive: false });
   }
+
 
   function lightboxDownload(e){
     e.stopPropagation();
@@ -938,9 +980,8 @@
     const lb = document.getElementById('lightbox');
     if (!lb.classList.contains('open')) return;
     if (e.key === 'Escape') closeLightbox();
-    const scrollEl = document.getElementById('lightbox-scroll');
-    if (e.key === 'ArrowLeft') scrollEl.scrollBy({ left: -scrollEl.clientWidth, behavior: 'smooth' });
-    if (e.key === 'ArrowRight') scrollEl.scrollBy({ left: scrollEl.clientWidth, behavior: 'smooth' });
+    if (e.key === 'ArrowLeft') lightboxNav(-1);
+    if (e.key === 'ArrowRight') lightboxNav(1);
   });
 
   bindLightboxScroll();
