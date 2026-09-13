@@ -286,31 +286,19 @@
     transition: opacity .18s ease;
   }
   .lightbox.open{ opacity:1; pointer-events:auto; }
-  .lightbox-scroll{
+  .lightbox-stage{
     width:100%; height:100%;
-    display:flex;
-    overflow-x:auto;
-    overflow-y:hidden;
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-  }
-  .lightbox-scroll::-webkit-scrollbar{ display:none; }
-  .lightbox-scroll{ cursor: grab; }
-  .lightbox-scroll.dragging{ cursor: grabbing; }
-  .lightbox-slide{
-    flex: 0 0 100%;
-    width:100%; height:100%;
-    scroll-snap-align: center;
     display:flex; align-items:center; justify-content:center;
+    cursor: grab;
   }
-  .lightbox-slide img{
+  .lightbox-stage.dragging{ cursor: grabbing; }
+  .lightbox-stage img{
     max-width: 94vw; max-height: 82vh;
     border-radius: 6px;
     box-shadow: 0 20px 60px rgba(0,0,0,0.5);
     user-select:none;
     -webkit-user-drag:none;
-    touch-action: pan-x;
+    touch-action: none;
     will-change: transform;
   }
   .lightbox-close{
@@ -456,7 +444,9 @@
   <button class="lightbox-close" onclick="closeLightbox()" title="닫기">
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2"><path d="M6 6l12 12M18 6L6 18"/></svg>
   </button>
-  <div class="lightbox-scroll" id="lightbox-scroll" onclick="if(event.target.tagName !== 'IMG') closeLightbox()"></div>
+  <div class="lightbox-stage" id="lightbox-stage" onclick="if(event.target.tagName !== 'IMG') closeLightbox()">
+    <img id="lightbox-img" data-scale="1" data-tx="0" data-ty="0" alt="" draggable="false" decoding="async">
+  </div>
   <button class="lightbox-nav lightbox-prev" id="lightbox-prev-btn" onclick="event.stopPropagation(); lightboxNav(-1)" title="이전 사진">
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.4"><path d="M15 18l-6-6 6-6"/></svg>
   </button>
@@ -695,60 +685,42 @@
   }
 
   let lightboxIndex = 0;
-  let lightboxScrolling = false;
 
   function openLightbox(i){
-    lightboxIndex = i;
-    const photos = MANIFEST[state.brand][state.part].photos;
-    const scrollEl = document.getElementById('lightbox-scroll');
-    scrollEl.innerHTML = photos.map((url) => `
-      <div class="lightbox-slide"><img data-src="${url}" data-scale="1" data-tx="0" data-ty="0" alt="" draggable="false" decoding="async"></div>
-    `).join('');
-    updateLightboxCounter();
-    updateNavButtons();
+    showSlide(i);
     document.getElementById('lightbox').classList.add('open');
     document.body.style.overflow = 'hidden';
-    ensureSlidesLoaded(scrollEl, i);
-    // 스크롤 위치를 해당 인덱스로 즉시 이동 (애니메이션 없이)
-    requestAnimationFrame(() => {
-      lightboxScrolling = true;
-      scrollEl.scrollTo({ left: i * scrollEl.clientWidth, behavior: 'instant' });
-      setTimeout(() => { lightboxScrolling = false; }, 50);
+  }
+
+  // 사진 한 장만 표시하고, 넘길 때 슬라이드 애니메이션 없이 바로 교체한다.
+  function showSlide(idx){
+    const photos = MANIFEST[state.brand][state.part].photos;
+    lightboxIndex = idx;
+    const img = document.getElementById('lightbox-img');
+    img.src = photos[idx];
+    img.dataset.scale = 1; img.dataset.tx = 0; img.dataset.ty = 0;
+    img.style.transform = 'translate(0px, 0px) scale(1)';
+    img.style.touchAction = 'none';
+    updateLightboxCounter();
+    updateNavButtons();
+    // 양옆 사진은 미리 캐시에 받아둬서 넘길 때 로딩 없이 바로 뜨게 함
+    [photos[idx - 1], photos[idx + 1]].forEach(url => {
+      if (url){ const pre = new Image(); pre.src = url; }
     });
   }
 
-  // 좌우 넘기기 버튼 (지마켓 상품 이미지처럼 - 스크롤/드래그 감도에 기대지 않고 버튼으로 확실하게 넘김)
+  // 좌우 넘기기 버튼 (지마켓 상품 이미지처럼) - 슬라이드 애니메이션 없이 바로 다음/이전 사진으로 교체
   function lightboxNav(delta){
     const photos = MANIFEST[state.brand][state.part].photos;
     const idx = Math.max(0, Math.min(photos.length - 1, lightboxIndex + delta));
     if (idx === lightboxIndex) return;
-    const scrollEl = document.getElementById('lightbox-scroll');
-    lightboxIndex = idx;
-    lightboxScrolling = true;
-    scrollEl.scrollTo({ left: idx * scrollEl.clientWidth, behavior: 'smooth' });
-    updateLightboxCounter();
-    updateNavButtons();
-    resetAllZoom(scrollEl);
-    ensureSlidesLoaded(scrollEl, idx);
-    clearTimeout(lightboxNav._timer);
-    lightboxNav._timer = setTimeout(() => { lightboxScrolling = false; }, 400);
+    showSlide(idx);
   }
 
   function updateNavButtons(){
     const photos = MANIFEST[state.brand][state.part].photos;
     document.getElementById('lightbox-prev-btn').classList.toggle('disabled', lightboxIndex <= 0);
     document.getElementById('lightbox-next-btn').classList.toggle('disabled', lightboxIndex >= photos.length - 1);
-  }
-
-  // 현재 인덱스와 바로 양옆 사진만 실제 로드 (전체를 한꺼번에 불러와서 버벅이는 것 방지)
-  function ensureSlidesLoaded(scrollEl, idx){
-    const slides = scrollEl.querySelectorAll('.lightbox-slide img');
-    [idx - 1, idx, idx + 1].forEach(n => {
-      const img = slides[n];
-      if (img && !img.src && img.dataset.src){
-        img.src = img.dataset.src;
-      }
-    });
   }
 
   function closeLightbox(){
@@ -761,46 +733,17 @@
     document.getElementById('lightbox-counter').textContent = `${lightboxIndex+1} / ${photos.length}`;
   }
 
-  function resetAllZoom(scrollEl){
-    scrollEl.querySelectorAll('img').forEach(img => {
-      img.style.transform = 'translate(0px, 0px) scale(1)';
-      img.dataset.scale = 1;
-      img.dataset.tx = 0;
-      img.dataset.ty = 0;
-      img.style.touchAction = 'pan-x';
-    });
-  }
-
-  // 스크롤(스와이프)이 멈추면 현재 위치에 맞는 인덱스로 갱신 + 확대 상태 초기화
-  let scrollEndTimer = null;
-  function bindLightboxScroll(){
-    const scrollEl = document.getElementById('lightbox-scroll');
-    scrollEl.addEventListener('scroll', () => {
-      if (lightboxScrolling) return;
-      clearTimeout(scrollEndTimer);
-      scrollEndTimer = setTimeout(() => {
-        const idx = Math.round(scrollEl.scrollLeft / scrollEl.clientWidth);
-        if (idx !== lightboxIndex){
-          lightboxIndex = idx;
-          updateLightboxCounter();
-          updateNavButtons();
-          resetAllZoom(scrollEl);
-        }
-        ensureSlidesLoaded(scrollEl, lightboxIndex);
-      }, 100);
-    }, { passive: true });
-  }
-
-
-  // 핀치줌 / 더블탭 확대 / 드래그 이동 (인스타그램 스타일)
-  // + 데스크톱(마우스/트랙패드) 지원: 마우스 드래그로 스와이프, 휠로 넘기기, Ctrl+휠/트랙패드 핀치로 확대
-  function initZoomHandlers(scrollEl){
+  // 핀치줌 / 더블탭 확대 / 확대 상태에서 드래그 이동 (인스타그램 스타일)
+  // + 웹(마우스/트랙패드): 휠로 확대·축소, 좌우 스와이프는 버튼으로 (슬라이드 애니메이션 없이 즉시 전환)
+  function initZoomHandlers(stage){
     const MAX_SCALE = 4;
+    const SWIPE_THRESHOLD = 60; // 이 이상 드래그해야 다음/이전 사진으로 넘어감
     const pointers = new Map();
     let pinchStartDist = 0, pinchStartScale = 1;
     let panStart = null;
     let lastTapTime = 0, lastTapImg = null;
-    let mouseDrag = null; // 마우스로 스와이프(확대 안 된 상태에서 좌우 넘기기)
+    let swipeTrack = null; // 확대 안 된 상태에서 드래그로 넘기기 판정용 (마우스+터치 공용, 시각적 이동 없이 놓을 때만 판정)
+    let downInfo = null; // 이번 포인터가 탭인지 드래그인지 판정하기 위한 시작 위치 기록
 
     function getImg(target){
       return target && target.tagName === 'IMG' ? target : null;
@@ -820,72 +763,51 @@
       img.dataset.tx = Math.min(maxX, Math.max(-maxX, parseFloat(img.dataset.tx)));
       img.dataset.ty = Math.min(maxY, Math.max(-maxY, parseFloat(img.dataset.ty)));
     }
-    function currentSlideImg(){
-      const idx = Math.round(scrollEl.scrollLeft / scrollEl.clientWidth);
-      return scrollEl.querySelectorAll('.lightbox-slide img')[idx];
-    }
     function zoomImgBy(img, delta){
       let scale = parseFloat(img.dataset.scale || 1) + delta;
       scale = Math.min(MAX_SCALE, Math.max(1, scale));
       img.dataset.scale = scale;
-      img.style.touchAction = scale > 1 ? 'none' : 'pan-x';
       clampPan(img, scale);
       applyTransform(img);
     }
 
-    scrollEl.addEventListener('pointerdown', (e) => {
+    const TAP_MOVE_THRESHOLD = 10; // 이 이하로 움직이면 '탭'으로 간주 (더블탭 판정용)
+
+    stage.addEventListener('pointerdown', (e) => {
       const img = getImg(e.target);
       if (!img) return;
       pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
       img.setPointerCapture(e.pointerId);
 
       if (pointers.size === 1){
-        const now = Date.now();
-        if (lastTapImg === img && now - lastTapTime < 300){
-          // 더블탭/더블클릭: 1x <-> 2.5x 토글
-          const cur = parseFloat(img.dataset.scale || 1);
-          if (cur > 1){
-            img.dataset.scale = 1; img.dataset.tx = 0; img.dataset.ty = 0;
-            img.style.touchAction = 'pan-x';
-          } else {
-            img.dataset.scale = 2.5;
-            img.dataset.tx = 0; img.dataset.ty = 0;
-            img.style.touchAction = 'none';
-          }
-          applyTransform(img);
-          lastTapTime = 0;
+        // 탭인지 드래그인지는 손을 뗄 때(pointerup) 이동거리로 판정한다.
+        // 여기서 더블탭 여부를 바로 확정해버리면, 스와이프 시작점이 우연히
+        // 직전 탭과 가까운 시간에 눌렸을 때 확대 토글로 오작동하는 문제가 있었음.
+        downInfo = { img, x: e.clientX, y: e.clientY };
+        if (parseFloat(img.dataset.scale || 1) > 1){
+          panStart = { x: e.clientX, y: e.clientY, tx: parseFloat(img.dataset.tx||0), ty: parseFloat(img.dataset.ty||0), img };
         } else {
-          lastTapTime = now;
-          lastTapImg = img;
-          if (parseFloat(img.dataset.scale || 1) > 1){
-            panStart = { x: e.clientX, y: e.clientY, tx: parseFloat(img.dataset.tx||0), ty: parseFloat(img.dataset.ty||0), img };
-          } else if (e.pointerType === 'mouse'){
-            // 확대 안 된 상태에서 마우스 클릭+드래그 = 좌우 스와이프 (인스타그램 웹처럼)
-            mouseDrag = { startX: e.clientX, startScroll: scrollEl.scrollLeft, moved: false };
-            scrollEl.classList.add('dragging');
-            scrollEl.style.scrollSnapType = 'none'; // 드래그 중엔 스냅이 scrollLeft 대입을 즉시 되돌리므로 잠깐 꺼둠
-          }
+          // 확대 안 된 상태 - 넘기기 제스처 판정 시작 (시각적으로는 움직이지 않고, 놓을 때 임계값 넘었으면 바로 전환)
+          swipeTrack = { startX: e.clientX, startY: e.clientY };
+          stage.classList.add('dragging');
         }
       } else if (pointers.size === 2){
         const pts = Array.from(pointers.values());
         pinchStartDist = dist(pts);
         pinchStartScale = parseFloat(img.dataset.scale || 1);
         panStart = null;
-        img.style.touchAction = 'none'; // 핀치 시작 즉시 브라우저 기본 확대와 충돌 방지
+        swipeTrack = null;
+        downInfo = null;
+        stage.classList.remove('dragging');
         e.preventDefault();
       }
     });
 
-    scrollEl.addEventListener('pointermove', (e) => {
-      if (mouseDrag){
-        const dx = e.clientX - mouseDrag.startX;
-        if (Math.abs(dx) > 3) mouseDrag.moved = true;
-        scrollEl.scrollLeft = mouseDrag.startScroll - dx;
-        return;
-      }
+
+    stage.addEventListener('pointermove', (e) => {
       if (!pointers.has(e.pointerId)) return;
       pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
-      const img = getImg(e.target) || lastTapImg;
+      const img = getImg(e.target) || (downInfo && downInfo.img);
       if (!img) return;
 
       if (pointers.size === 2 && pinchStartDist > 0){
@@ -894,7 +816,6 @@
         let scale = pinchStartScale * (newDist / pinchStartDist);
         scale = Math.min(MAX_SCALE, Math.max(1, scale));
         img.dataset.scale = scale;
-        img.style.touchAction = scale > 1 ? 'none' : 'pan-x';
         clampPan(img, scale);
         applyTransform(img);
       } else if (pointers.size === 1 && panStart && panStart.img === img){
@@ -911,24 +832,53 @@
       pointers.delete(e.pointerId);
       if (pointers.size < 2) pinchStartDist = 0;
       if (pointers.size === 0) panStart = null;
-      if (mouseDrag){
-        scrollEl.classList.remove('dragging');
-        // 놓으면 가장 가까운 사진으로 스냅
-        const idx = Math.round(scrollEl.scrollLeft / scrollEl.clientWidth);
-        scrollEl.scrollTo({ left: idx * scrollEl.clientWidth, behavior: 'smooth' });
-        scrollEl.style.scrollSnapType = ''; // 스냅 복원
-        mouseDrag = null;
+      stage.classList.remove('dragging');
+
+      if (!downInfo){ swipeTrack = null; return; }
+      const totalDx = e.clientX - downInfo.x;
+      const totalDy = e.clientY - downInfo.y;
+      const movedDist = Math.hypot(totalDx, totalDy);
+      const img = downInfo.img;
+      const wasSwipeTrack = swipeTrack;
+      downInfo = null;
+      swipeTrack = null;
+
+      if (movedDist < TAP_MOVE_THRESHOLD){
+        // 거의 움직이지 않은 '탭' - 더블탭 확대 판정
+        const now = Date.now();
+        if (lastTapImg === img && now - lastTapTime < 300){
+          const cur = parseFloat(img.dataset.scale || 1);
+          if (cur > 1){
+            img.dataset.scale = 1; img.dataset.tx = 0; img.dataset.ty = 0;
+          } else {
+            img.dataset.scale = 2.5;
+            img.dataset.tx = 0; img.dataset.ty = 0;
+          }
+          applyTransform(img);
+          lastTapTime = 0;
+        } else {
+          lastTapTime = now;
+          lastTapImg = img;
+        }
+        return;
+      }
+
+      // 드래그였으므로 더블탭 판정에 영향 주지 않도록 무효화
+      lastTapTime = 0;
+
+      // 가로로 충분히 끌었을 때만 넘기기로 인정 (세로 스크롤 제스처와 헷갈리지 않도록)
+      if (wasSwipeTrack && Math.abs(totalDx) > SWIPE_THRESHOLD && Math.abs(totalDx) > Math.abs(totalDy)){
+        lightboxNav(totalDx < 0 ? 1 : -1);
       }
     }
-    scrollEl.addEventListener('pointerup', endPointer);
-    scrollEl.addEventListener('pointercancel', endPointer);
+    stage.addEventListener('pointerup', endPointer);
+    stage.addEventListener('pointercancel', endPointer);
 
-    // 지마켓 상품 이미지처럼: 휠은 넘기기가 아니라 확대/축소 전용 (스크롤로 넘기던 방식은 감도가 뻑뻑해서 제거)
-    // 넘기기는 좌우 화살표 버튼(lightboxNav)으로 확실하게 처리
-    scrollEl.addEventListener('wheel', (e) => {
+    // 지마켓 상품 이미지처럼: 휠(마우스/트랙패드)은 확대/축소 전용
+    stage.addEventListener('wheel', (e) => {
       e.preventDefault();
-      const img = currentSlideImg();
-      if (img) zoomImgBy(img, -e.deltaY * 0.015);
+      const img = document.getElementById('lightbox-img');
+      zoomImgBy(img, -e.deltaY * 0.015);
     }, { passive: false });
   }
 
@@ -984,8 +934,7 @@
     if (e.key === 'ArrowRight') lightboxNav(1);
   });
 
-  bindLightboxScroll();
-  initZoomHandlers(document.getElementById('lightbox-scroll'));
+  initZoomHandlers(document.getElementById('lightbox-stage'));
 
   function showToast(msg){
     const t = document.getElementById('toast');
