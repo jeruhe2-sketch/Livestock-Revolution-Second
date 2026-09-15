@@ -688,11 +688,20 @@
       </div>`;
     }
 
+    // 숫자(수량/중량 등)는 천단위 콤마로 표시. 정수면 소수점 없이, 아니면 최대 2자리까지.
+    function fmtQty(v){
+      if (v === null || v === undefined || v === '') return v;
+      const num = Number(v);
+      if (isNaN(num)) return v;
+      return num.toLocaleString('ko-KR', { maximumFractionDigits: 2 });
+    }
+    const NUMERIC_FIELDS = new Set(['수량(BOX)','중량(KG)','재고수량','중량(kg)']);
+
     // 배치 정보 한 줄 요약에 쓸 필드 순서 (자재명/BL/EST/등급을 우선 노출)
     const BATCH_FIELD_ORDER = ['자재명','BL','EST','등급','원산지','창고','구매처','수량(BOX)','중량(KG)','선적일','입고일','통관일','유통기한','유통이력번호','비고'];
     function batchInfoRows(b){
       return BATCH_FIELD_ORDER.filter(k => b[k] !== undefined && b[k] !== null && b[k] !== '')
-        .map(k => `<div class="row"><span class="k">${k}</span><span class="v">${b[k]}</span></div>`).join('');
+        .map(k => `<div class="row"><span class="k">${k}</span><span class="v">${NUMERIC_FIELDS.has(k) ? fmtQty(b[k]) : b[k]}</span></div>`).join('');
     }
 
     let bodyHtml;
@@ -728,7 +737,7 @@
       // 레거시: 부위 전체에 정보 한 블록 (기존 방식 그대로)
       const cellsHtml = obj.photos.map((url, i) => photoCell(url, i)).join('');
       const infoHtml = Object.entries(obj.info || {}).map(([k,v]) => `
-        <div class="row"><span class="k">${k}</span><span class="v">${v}</span></div>
+        <div class="row"><span class="k">${k}</span><span class="v">${NUMERIC_FIELDS.has(k) ? fmtQty(v) : v}</span></div>
       `).join('');
       bodyHtml = `<div class="photo-grid">${cellsHtml}</div><div class="detail-info">${infoHtml}</div>`;
     }
