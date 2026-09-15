@@ -265,6 +265,14 @@
     background: var(--card); border: 1px solid var(--line); border-radius: 6px;
     padding: 2px 7px;
   }
+  .batch-dl-btn{
+    display:inline-flex; align-items:center; gap:5px;
+    margin-left: auto;
+    font-size: 11.5px; font-weight: 700; color: var(--cold);
+    background: rgba(51,88,107,0.08); border: 1px solid var(--cold);
+    border-radius: 999px; padding: 4px 10px; cursor: pointer;
+  }
+  .batch-dl-btn:hover{ background: var(--cold); color:#fff; }
   .detail-info.batch-info{ margin-top: 10px; padding: 12px 16px; }
 
   .sample-badge{
@@ -473,7 +481,7 @@
     const withoutExt = dot > -1 ? rest.slice(0, dot) : rest;
     return `${head}thumbs/${withoutExt}.jpg${query}`;
   }
-  let state = { species: null, brand: null, part: null, est: null, grade: null };
+  let state = { species: null, brand: null, part: null, est: null, grade: null, bl: null };
 
   function speciesBrands(sp){ return MANIFEST[sp] || {}; }
   function speciesBrandCount(sp){ return Object.keys(speciesBrands(sp)).length; }
@@ -535,18 +543,19 @@
     render();
   }
 
-  function emptyState(){ return { species: null, brand: null, part: null, est: null, grade: null }; }
+  function emptyState(){ return { species: null, brand: null, part: null, est: null, grade: null, bl: null }; }
 
   function applyStateFromHash(){
     const hash = decodeURIComponent(location.hash.replace(/^#/, ''));
     if (!hash){ state = emptyState(); return; }
-    const [sp, b, p, est, grade] = hash.split('/');
+    const [sp, b, p, est, grade, bl] = hash.split('/');
     if (sp && MANIFEST[sp]){
       state.species = sp;
       state.brand = (b && MANIFEST[sp][b]) ? b : null;
       state.part = (state.brand && p && MANIFEST[sp][state.brand][p]) ? p : null;
       state.est = state.part ? (est || null) : null;
       state.grade = state.part ? (grade || null) : null;
+      state.bl = state.part ? (bl || null) : null;
     } else {
       state = emptyState();
     }
@@ -554,7 +563,7 @@
 
   // 화면 전환할 때마다 히스토리에 새 항목을 쌓는다 -> 하드웨어/제스처 뒤로가기가 앱 안에서 동작하게 됨
   function pushState(){
-    const segs = [state.species, state.brand, state.part, state.est, state.grade];
+    const segs = [state.species, state.brand, state.part, state.est, state.grade, state.bl];
     while (segs.length && !segs[segs.length - 1]) segs.pop();
     const hash = segs.length ? `#${segs.map(encodeURIComponent).join('/')}` : (location.pathname + location.search);
     history.pushState({ ...state }, '', hash);
@@ -564,7 +573,7 @@
     const lb = document.getElementById('lightbox');
     if (lb.classList.contains('open')) closeLightbox();
     if (e.state){
-      state = { species: e.state.species || null, brand: e.state.brand || null, part: e.state.part || null, est: e.state.est || null, grade: e.state.grade || null };
+      state = { species: e.state.species || null, brand: e.state.brand || null, part: e.state.part || null, est: e.state.est || null, grade: e.state.grade || null, bl: e.state.bl || null };
     } else {
       applyStateFromHash();
     }
@@ -572,11 +581,12 @@
   });
 
   function goHome(){ state = emptyState(); pushState(); render(); }
-  function goSpecies(sp){ state = { species: sp, brand: null, part: null, est: null, grade: null }; pushState(); render(); }
-  function goBrand(sp, b){ state = { species: sp, brand: b, part: null, est: null, grade: null }; pushState(); render(); }
-  function goPart(sp, b, p){ state = { species: sp, brand: b, part: p, est: null, grade: null }; pushState(); render(); }
-  function goEst(sp, b, p, est){ state = { species: sp, brand: b, part: p, est: est, grade: null }; pushState(); render(); }
-  function goGrade(sp, b, p, est, grade){ state = { species: sp, brand: b, part: p, est: est, grade: grade }; pushState(); render(); }
+  function goSpecies(sp){ state = { species: sp, brand: null, part: null, est: null, grade: null, bl: null }; pushState(); render(); }
+  function goBrand(sp, b){ state = { species: sp, brand: b, part: null, est: null, grade: null, bl: null }; pushState(); render(); }
+  function goPart(sp, b, p){ state = { species: sp, brand: b, part: p, est: null, grade: null, bl: null }; pushState(); render(); }
+  function goEst(sp, b, p, est){ state = { species: sp, brand: b, part: p, est: est, grade: null, bl: null }; pushState(); render(); }
+  function goGrade(sp, b, p, est, grade){ state = { species: sp, brand: b, part: p, est: est, grade: grade, bl: null }; pushState(); render(); }
+  function goBl(sp, b, p, est, grade, bl){ state = { species: sp, brand: b, part: p, est: est, grade: grade, bl: bl }; pushState(); render(); }
 
   // 브레드크럼의 "뒤로" 버튼은 실제 브라우저 히스토리를 한 칸 되돌린다
   // (popstate 리스너가 상태 복원과 렌더링을 처리)
@@ -627,13 +637,33 @@
       return Object.assign({}, b, { _start: start, EST: normMultiVal(b.EST) });
     });
   }
+  // "2025.03.15" 같은 날짜 문자열을 정렬 가능한 숫자로 변환. 날짜가 없으면 맨 뒤로.
+  function dateSortKey(str){
+    if (!str) return Infinity;
+    const m = String(str).match(/(\d{4})[.\-\/](\d{1,2})[.\-\/](\d{1,2})/);
+    if (!m) return Infinity;
+    return Number(m[1]) * 10000 + Number(m[2]) * 100 + Number(m[3]);
+  }
+  // 배치의 대표 날짜: 선적일(수입) 우선, 없으면 입고일(내수)
+  function batchDate(b){ return b['선적일'] || b['입고일'] || null; }
+  function sortByDate(batches){
+    return [...batches].sort((a, b) => dateSortKey(batchDate(a)) - dateSortKey(batchDate(b)));
+  }
   function distinctValues(batches, key, filterFn){
     const set = new Set();
     batches.forEach(b => { if ((!filterFn || filterFn(b)) && b[key]) set.add(String(b[key])); });
     return [...set];
   }
+  // 옵션(EST/등급/BL) 카드를 그 값에 해당하는 배치들 중 가장 이른 선적일 기준으로 정렬
+  function sortedOptionValues(batches, key){
+    const values = distinctValues(batches, key);
+    return values
+      .map(v => ({ v, batches: batches.filter(b => String(b[key]) === v) }))
+      .sort((a, b) => dateSortKey(batchDate(sortByDate(a.batches)[0])) - dateSortKey(batchDate(sortByDate(b.batches)[0])))
+      .map(x => x.v);
+  }
   function optionThumb(obj, batches){
-    const first = batches[0];
+    const first = sortByDate(batches)[0];
     return first ? toThumbUrl(obj.photos[first._start]) : '';
   }
   function optionPhotoCount(batches){
@@ -735,7 +765,7 @@
     ];
 
     // 3층: EST 선택 (한 부위 안에 EST가 2개 이상 섞여 있을 때만 등장, 아니면 자동 통과)
-    const estOptions = distinctValues(allBatches, 'EST');
+    const estOptions = sortedOptionValues(allBatches, 'EST');
     if (estOptions.length > 1 && !state.est){
       renderBreadcrumb(`goBrand('${state.species}','${state.brand}')`, crumbBase);
       const cardsHtml = estOptions.map(est => {
@@ -756,7 +786,7 @@
 
     // 4층: 등급 선택 (EST 확정 후, 등급이 2개 이상 섞여 있을 때만 등장)
     const estFiltered = allBatches.filter(b => !state.est || String(b.EST) === state.est);
-    const gradeOptions = distinctValues(estFiltered, '등급');
+    const gradeOptions = sortedOptionValues(estFiltered, '등급');
     if (gradeOptions.length > 1 && !state.grade){
       const gradeCrumbs = state.est
         ? [...crumbBase, { label: 'EST ' + state.est, onclick: `goEst('${state.species}','${state.brand}','${state.part}','${state.est}')` }]
@@ -781,8 +811,43 @@
       return;
     }
 
-    // 5층: 사진 + 정보 (EST/등급까지 확정된, 혹은 애초에 구분이 필요 없던 최종 상태)
-    const finalBatches = estFiltered.filter(b => !state.grade || b['등급'] === state.grade);
+    // EST/등급까지 확정된 상태에서 남은 배치들
+    const gradeFiltered = estFiltered.filter(b => !state.grade || b['등급'] === state.grade);
+    const gradeCrumbsForBl = (() => {
+      const c = [...crumbBase];
+      if (state.est) c.push({ label: 'EST ' + state.est, onclick: `goEst('${state.species}','${state.brand}','${state.part}','${state.est}')` });
+      if (state.grade) c.push({ label: '등급 ' + state.grade, onclick: `goGrade('${state.species}','${state.brand}','${state.part}','${state.est||''}','${state.grade}')` });
+      return c;
+    })();
+    const blBackTarget = (() => {
+      if (state.grade) return `goGrade('${state.species}','${state.brand}','${state.part}','${state.est||''}','${state.grade}')`;
+      if (state.est) return `goEst('${state.species}','${state.brand}','${state.part}','${state.est}')`;
+      return `goPart('${state.species}','${state.brand}','${state.part}')`;
+    })();
+
+    // 5층: BL 선택 (EST/등급까지 확정한 상태에서 실제 수입 건(BL)이 2개 이상 섞여 있을 때만 등장)
+    const blOptions = sortedOptionValues(gradeFiltered, 'BL');
+    if (blOptions.length > 1 && !state.bl){
+      renderBreadcrumb(blBackTarget, gradeCrumbsForBl);
+      const cardsHtml = blOptions.map(bl => {
+        const matched = gradeFiltered.filter(b => b.BL === bl);
+        const date = batchDate(matched[0]);
+        return `
+          <div class="select-card" onclick="goBl('${state.species}','${state.brand}','${state.part}','${state.est||''}','${state.grade||''}','${bl}')">
+            ${thumbHtml(optionThumb(obj, matched), `${optionPhotoCount(matched)}장`)}
+            <div class="body">
+              <div class="name">BL ${bl}</div>
+              <div class="sub">${date || obj.displayName}</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+      main.innerHTML = `<div class="select-grid">${cardsHtml}</div>`;
+      return;
+    }
+
+    // 6층: 사진 + 정보 (EST/등급/BL까지 확정된, 혹은 애초에 구분이 필요 없던 최종 상태)
+    const finalBatches = sortByDate(gradeFiltered.filter(b => !state.bl || b.BL === state.bl));
 
     function photoCell(url, i){
       return `
@@ -813,7 +878,7 @@
     let bodyHtml;
     let totalCount;
     if (Array.isArray(obj.batches)){
-      // 배치(ERP) 구조: EST/등급까지 좁혀진 배치들만 자재명/BL 단위로 섹션을 나눠서 표시
+      // 배치(ERP) 구조: BL 단위로 섹션을 나눠서 표시, 각 섹션마다 그 BL만 따로 다운로드 가능
       const sections = finalBatches.map((b) => {
         const cellsHtml = obj.photos.slice(b._start, b._start + (b.photoCount||0))
           .map((url, j) => photoCell(url, b._start + j)).join('');
@@ -822,6 +887,10 @@
             <div class="batch-header">
               <span class="batch-title">${b.label || obj.displayName}</span>
               ${b.BL ? `<span class="batch-bl">BL ${b.BL}</span>` : ''}
+              <button class="batch-dl-btn" onclick="downloadAll(${b._start}, ${b.photoCount||0})" title="이 BL만 다운로드">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 3v12"/><path d="M6 11l6 6 6-6"/><path d="M5 21h14"/></svg>
+                이 BL 다운로드 (${b.photoCount||0}장)
+              </button>
             </div>
             <div class="photo-grid">${cellsHtml}</div>
             <div class="detail-info batch-info">${batchInfoRows(b)}</div>
@@ -848,13 +917,14 @@
       totalCount = obj.photos.length;
     }
 
-    const finalCrumbs = [...crumbBase];
-    if (state.est) finalCrumbs.push({ label: 'EST ' + state.est, onclick: `goEst('${state.species}','${state.brand}','${state.part}','${state.est}')` });
-    if (state.grade) finalCrumbs.push({ label: '등급 ' + state.grade });
+    const finalCrumbs = [...gradeCrumbsForBl];
+    if (state.bl) finalCrumbs.push({ label: 'BL ' + state.bl });
 
-    // "뒤로"는 방금 거쳐온 화면(EST/등급 선택이 실제로 있었으면 그쪽으로, 아니면 부위 선택으로)으로 돌아간다
+    // "뒤로"는 방금 거쳐온 화면(BL/등급/EST 선택이 실제로 있었으면 그쪽으로, 아니면 부위 선택으로)으로 돌아간다
     let backOnclick;
-    if (state.grade){
+    if (state.bl){
+      backOnclick = `goGrade('${state.species}','${state.brand}','${state.part}','${state.est||''}','${state.grade||''}')`;
+    } else if (state.grade){
       backOnclick = `goEst('${state.species}','${state.brand}','${state.part}','${state.est||''}')`;
     } else if (state.est){
       backOnclick = `goPart('${state.species}','${state.brand}','${state.part}')`;
@@ -1188,24 +1258,27 @@
   }
 
   // 전체 다운로드 (배치 중엔 새 탭을 띄우지 않고, 끝나고 실패 목록만 안내)
-  async function downloadAll(){
+  async function downloadAll(startIdx, count){
     const obj = getObj();
-    showToast(`${obj.photos.length}장 다운로드를 시작합니다`);
+    const start = startIdx || 0;
+    const targets = (count === undefined || count === null) ? obj.photos : obj.photos.slice(start, start + count);
+    showToast(`${targets.length}장 다운로드를 시작합니다`);
     const failed = [];
-    for (let i = 0; i < obj.photos.length; i++){
+    for (let j = 0; j < targets.length; j++){
+      const i = start + j;
       try {
-        const blob = await fetchAsBlob(obj.photos[i], 1);
-        triggerBlobDownload(blob, obj.photos[i]);
+        const blob = await fetchAsBlob(targets[j], 1);
+        triggerBlobDownload(blob, targets[j]);
       } catch(e) {
-        console.error('배치 다운로드 실패', obj.photos[i], e);
+        console.error('배치 다운로드 실패', targets[j], e);
         failed.push(i + 1);
       }
       await new Promise(r => setTimeout(r, 450));
     }
     if (failed.length === 0){
-      showToast(`${obj.photos.length}장 전부 다운로드 완료`);
+      showToast(`${targets.length}장 전부 다운로드 완료`);
     } else {
-      showToast(`${obj.photos.length - failed.length}장 성공, ${failed.length}장 실패(${failed.join(',')}번). 실패한 사진은 개별 다운로드 버튼으로 다시 받아주세요.`);
+      showToast(`${targets.length - failed.length}장 성공, ${failed.length}장 실패(${failed.join(',')}번). 실패한 사진은 개별 다운로드 버튼으로 다시 받아주세요.`);
     }
   }
 
