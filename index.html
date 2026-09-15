@@ -181,6 +181,10 @@
     transition: transform .12s ease, border-color .12s ease, box-shadow .12s ease;
   }
   .select-card:hover{ border-color: var(--accent); box-shadow: 0 6px 18px rgba(22,32,28,0.07); transform: translateY(-2px); }
+  .select-card.disabled{ cursor: default; opacity: 0.5; }
+  .select-card.disabled:hover{ border-color: var(--line); box-shadow: none; transform: none; }
+  .chip.disabled{ cursor: default; opacity: 0.45; }
+  .chip.disabled:hover{ border-color: var(--line); }
   .select-card .thumb{
     position: relative;
     width: 100%;
@@ -458,7 +462,8 @@
       <h1>축산 라이브러리</h1>
       <span>PHOTO ARCHIVE</span>
     </div>
-    <div class="chip-row" id="brand-chips">
+    <div class="chip-row" id="species-chips"></div>
+    <div class="chip-row hidden" id="brand-chips">
       <div class="skeleton-card" style="width:70px;height:30px;border-radius:20px;flex-shrink:0;"></div>
       <div class="skeleton-card" style="width:90px;height:30px;border-radius:20px;flex-shrink:0;"></div>
       <div class="skeleton-card" style="width:60px;height:30px;border-radius:20px;flex-shrink:0;"></div>
@@ -492,6 +497,7 @@
 
 <script>
   let MANIFEST = {};
+  const SPECIES_LIST = ['돈육','우육','계육'];
 
   // 원본 URL(예: https://.../r2.dev/AGROSUPER/전지/xxx.png)을
   // 썸네일 URL(https://.../r2.dev/thumbs/AGROSUPER/전지/xxx.jpg)로 변환
@@ -508,21 +514,37 @@
     const withoutExt = dot > -1 ? rest.slice(0, dot) : rest;
     return `${head}thumbs/${withoutExt}.jpg${query}`;
   }
-  let state = { brand: null, part: null };
+  let state = { species: null, brand: null, part: null, est: null, grade: null };
+
+  function speciesBrands(sp){ return MANIFEST[sp] || {}; }
+  function speciesBrandCount(sp){ return Object.keys(speciesBrands(sp)).length; }
+  function speciesPhotoCount(sp){
+    return Object.values(speciesBrands(sp)).reduce((sum, parts) =>
+      sum + Object.values(parts).reduce((s2, part) => s2 + part.photos.length, 0), 0);
+  }
+  function speciesThumbUrl(sp){
+    const brands = speciesBrands(sp);
+    for (const b of Object.keys(brands)){
+      for (const p of Object.keys(brands[b])){
+        if (brands[b][p].photos && brands[b][p].photos.length) return toThumbUrl(brands[b][p].photos[0]);
+      }
+    }
+    return '';
+  }
 
   // 브랜드 카드용: 부위 개수/전체 사진 장수/대표 썸네일
-  function brandPhotoCount(b){
-    return Object.values(MANIFEST[b]).reduce((sum, part) => sum + part.photos.length, 0);
+  function brandPhotoCount(sp, b){
+    return Object.values(MANIFEST[sp][b]).reduce((sum, part) => sum + part.photos.length, 0);
   }
-  function brandThumbUrl(b){
-    const parts = MANIFEST[b];
+  function brandThumbUrl(sp, b){
+    const parts = MANIFEST[sp][b];
     for (const p of Object.keys(parts)){
       if (parts[p].photos && parts[p].photos.length) return toThumbUrl(parts[p].photos[0]);
     }
     return '';
   }
-  function partThumbUrl(b, p){
-    const photos = MANIFEST[b][p].photos;
+  function partThumbUrl(sp, b, p){
+    const photos = MANIFEST[sp][b][p].photos;
     return (photos && photos.length) ? toThumbUrl(photos[0]) : '';
   }
   // 카드/그리드 썸네일 공통 마크업 (로딩 스켈레톤 -> 페이드인)
@@ -531,6 +553,14 @@
       ? `<img src="${url}" loading="lazy" onload="this.classList.add('loaded'); this.parentElement.classList.add('loaded')" onerror="this.parentElement.classList.add('loaded')">`
       : '';
     return `<div class="thumb skeleton-thumb">${img}<span class="badge">${badgeText}</span></div>`;
+  }
+
+  // 현재 선택된 부위 객체 (없으면 null)
+  function getObj(){
+    if (!(state.species && state.brand && state.part)) return null;
+    const sp = MANIFEST[state.species];
+    const br = sp && sp[state.brand];
+    return (br && br[state.part]) || null;
   }
 
   async function loadData(){
@@ -542,45 +572,52 @@
     }
     applyStateFromHash();
     // 첫 진입 상태를 히스토리 맨 앞에 기록해둔다 (뒤로가기의 최종 종착점)
-    history.replaceState({ brand: state.brand, part: state.part }, '', location.hash || location.pathname + location.search);
+    history.replaceState({ ...state }, '', location.hash || location.pathname + location.search);
     render();
   }
 
+  function emptyState(){ return { species: null, brand: null, part: null, est: null, grade: null }; }
+
   function applyStateFromHash(){
     const hash = decodeURIComponent(location.hash.replace(/^#/, ''));
-    if (!hash){ state = { brand: null, part: null }; return; }
-    const [b, p] = hash.split('/');
-    if (b && MANIFEST[b]){
-      state.brand = b;
-      state.part = (p && MANIFEST[b][p]) ? p : null;
+    if (!hash){ state = emptyState(); return; }
+    const [sp, b, p, est, grade] = hash.split('/');
+    if (sp && MANIFEST[sp]){
+      state.species = sp;
+      state.brand = (b && MANIFEST[sp][b]) ? b : null;
+      state.part = (state.brand && p && MANIFEST[sp][state.brand][p]) ? p : null;
+      state.est = state.part ? (est || null) : null;
+      state.grade = state.part ? (grade || null) : null;
     } else {
-      state = { brand: null, part: null };
+      state = emptyState();
     }
   }
 
   // 화면 전환할 때마다 히스토리에 새 항목을 쌓는다 -> 하드웨어/제스처 뒤로가기가 앱 안에서 동작하게 됨
   function pushState(){
-    let hash;
-    if (state.brand && state.part) hash = `#${encodeURIComponent(state.brand)}/${encodeURIComponent(state.part)}`;
-    else if (state.brand) hash = `#${encodeURIComponent(state.brand)}`;
-    else hash = location.pathname + location.search;
-    history.pushState({ brand: state.brand, part: state.part }, '', hash);
+    const segs = [state.species, state.brand, state.part, state.est, state.grade];
+    while (segs.length && !segs[segs.length - 1]) segs.pop();
+    const hash = segs.length ? `#${segs.map(encodeURIComponent).join('/')}` : (location.pathname + location.search);
+    history.pushState({ ...state }, '', hash);
   }
 
   window.addEventListener('popstate', (e) => {
     const lb = document.getElementById('lightbox');
     if (lb.classList.contains('open')) closeLightbox();
     if (e.state){
-      state = { brand: e.state.brand || null, part: e.state.part || null };
+      state = { species: e.state.species || null, brand: e.state.brand || null, part: e.state.part || null, est: e.state.est || null, grade: e.state.grade || null };
     } else {
       applyStateFromHash();
     }
     render();
   });
 
-  function goHome(){ state = { brand: null, part: null }; pushState(); render(); }
-  function goBrand(b){ state = { brand: b, part: null }; pushState(); render(); }
-  function goPart(b, p){ state = { brand: b, part: p }; pushState(); render(); }
+  function goHome(){ state = emptyState(); pushState(); render(); }
+  function goSpecies(sp){ state = { species: sp, brand: null, part: null, est: null, grade: null }; pushState(); render(); }
+  function goBrand(sp, b){ state = { species: sp, brand: b, part: null, est: null, grade: null }; pushState(); render(); }
+  function goPart(sp, b, p){ state = { species: sp, brand: b, part: p, est: null, grade: null }; pushState(); render(); }
+  function goEst(sp, b, p, est){ state = { species: sp, brand: b, part: p, est: est, grade: null }; pushState(); render(); }
+  function goGrade(sp, b, p, est, grade){ state = { species: sp, brand: b, part: p, est: est, grade: grade }; pushState(); render(); }
 
   // 브레드크럼의 "뒤로" 버튼은 실제 브라우저 히스토리를 한 칸 되돌린다
   // (popstate 리스너가 상태 복원과 렌더링을 처리)
@@ -589,21 +626,35 @@
   }
 
   function renderChips(){
-    const brands = Object.keys(MANIFEST);
-    const brandChipsEl = document.getElementById('brand-chips');
-    brandChipsEl.innerHTML = brands.map(b => {
-      const partCount = Object.keys(MANIFEST[b]).length;
-      const active = b === state.brand ? 'active' : '';
-      return `<div class="chip ${active}" onclick="goBrand('${b}')">${b}<span class="n">${partCount}</span></div>`;
+    const speciesChipsEl = document.getElementById('species-chips');
+    speciesChipsEl.innerHTML = SPECIES_LIST.map(sp => {
+      const active = sp === state.species ? 'active' : '';
+      const n = speciesBrandCount(sp);
+      const disabled = n === 0 ? 'disabled' : '';
+      return `<div class="chip ${active} ${disabled}" onclick="${n ? `goSpecies('${sp}')` : ''}">${sp}${n ? '' : ' (준비중)'}</div>`;
     }).join('');
 
+    const brandChipsEl = document.getElementById('brand-chips');
+    if (state.species && speciesBrandCount(state.species) > 0){
+      const brands = Object.keys(speciesBrands(state.species));
+      brandChipsEl.classList.remove('hidden');
+      brandChipsEl.innerHTML = brands.map(b => {
+        const partCount = Object.keys(MANIFEST[state.species][b]).length;
+        const active = b === state.brand ? 'active' : '';
+        return `<div class="chip ${active}" onclick="goBrand('${state.species}','${b}')">${b}<span class="n">${partCount}</span></div>`;
+      }).join('');
+    } else {
+      brandChipsEl.classList.add('hidden');
+      brandChipsEl.innerHTML = '';
+    }
+
     const partChipsEl = document.getElementById('part-chips');
-    if (state.brand){
-      const parts = MANIFEST[state.brand];
+    if (state.species && state.brand){
+      const parts = MANIFEST[state.species][state.brand];
       partChipsEl.classList.remove('hidden');
       partChipsEl.innerHTML = Object.keys(parts).map(p => {
         const active = p === state.part ? 'active' : '';
-        return `<div class="chip ${active}" onclick="goPart('${state.brand}','${p}')">${parts[p].displayName}</div>`;
+        return `<div class="chip ${active}" onclick="goPart('${state.species}','${state.brand}','${p}')">${parts[p].displayName}</div>`;
       }).join('');
     } else {
       partChipsEl.classList.add('hidden');
@@ -619,27 +670,53 @@
     }
   }
 
+  // batches 배열에 사진 시작 인덱스(_start)를 계산해서 붙여줌 (전역 photos 배열과의 매핑용)
+  function batchesWithOffset(obj){
+    let cursor = 0;
+    return (obj.batches || []).map(b => {
+      const start = cursor;
+      cursor += (b.photoCount || 0);
+      return Object.assign({}, b, { _start: start });
+    });
+  }
+  function distinctValues(batches, key, filterFn){
+    const set = new Set();
+    batches.forEach(b => { if ((!filterFn || filterFn(b)) && b[key]) set.add(String(b[key])); });
+    return [...set];
+  }
+  function optionThumb(obj, batches){
+    const first = batches[0];
+    return first ? toThumbUrl(obj.photos[first._start]) : '';
+  }
+  function optionPhotoCount(batches){
+    return batches.reduce((s,b) => s + (b.photoCount||0), 0);
+  }
+
   function renderInner(){
     renderChips();
     const main = document.getElementById('main');
-    const brands = Object.keys(MANIFEST);
 
-    if (brands.length === 0){
-      main.innerHTML = `<div class="empty-state">아직 등록된 사진이 없습니다</div>`;
-      return;
-    }
-
-    // 1층: 브랜드 선택
-    if (!state.brand){
-      const cardsHtml = brands.map(b => {
-        const partCount = Object.keys(MANIFEST[b]).length;
-        const photoCount = brandPhotoCount(b);
+    // 0층: 축종 선택
+    if (!state.species){
+      const cardsHtml = SPECIES_LIST.map(sp => {
+        const n = speciesBrandCount(sp);
+        if (n === 0){
+          return `
+            <div class="select-card disabled">
+              ${thumbHtml('', '준비중')}
+              <div class="body">
+                <div class="name">${sp}</div>
+                <div class="sub">준비중</div>
+              </div>
+            </div>
+          `;
+        }
         return `
-          <div class="select-card" onclick="goBrand('${b}')">
-            ${thumbHtml(brandThumbUrl(b), `${partCount}개 부위`)}
+          <div class="select-card" onclick="goSpecies('${sp}')">
+            ${thumbHtml(speciesThumbUrl(sp), `${n}개 브랜드`)}
             <div class="body">
-              <div class="name">${b}</div>
-              <div class="sub">${photoCount}장</div>
+              <div class="name">${sp}</div>
+              <div class="sub">${speciesPhotoCount(sp)}장</div>
             </div>
           </div>
         `;
@@ -648,17 +725,30 @@
       return;
     }
 
-    // 2층: 부위 선택
-    if (!state.part){
-      const parts = MANIFEST[state.brand];
-      const cardsHtml = Object.keys(parts).map(p => {
-        const obj = parts[p];
+    // 1층: 브랜드 선택
+    if (!state.brand){
+      const brands = Object.keys(speciesBrands(state.species));
+      if (brands.length === 0){
+        main.innerHTML = `
+          <div class="page-breadcrumb">
+            <button class="back-btn" onclick="goHome()">← 뒤로</button>
+            <span class="crumb" onclick="goHome()">전체</span>
+            <span class="sep">›</span>
+            <span class="current">${state.species}</span>
+          </div>
+          <div class="empty-state">${state.species} 사진은 아직 준비중입니다</div>
+        `;
+        return;
+      }
+      const cardsHtml = brands.map(b => {
+        const partCount = Object.keys(MANIFEST[state.species][b]).length;
+        const photoCount = brandPhotoCount(state.species, b);
         return `
-          <div class="select-card" onclick="goPart('${state.brand}','${p}')">
-            ${thumbHtml(partThumbUrl(state.brand, p), `${obj.photos.length}장`)}
+          <div class="select-card" onclick="goBrand('${state.species}','${b}')">
+            ${thumbHtml(brandThumbUrl(state.species, b), `${partCount}개 부위`)}
             <div class="body">
-              <div class="name">${obj.displayName}</div>
-              <div class="sub">${state.brand}</div>
+              <div class="name">${b}</div>
+              <div class="sub">${photoCount}장</div>
             </div>
           </div>
         `;
@@ -668,6 +758,35 @@
           <button class="back-btn" onclick="goHome()">← 뒤로</button>
           <span class="crumb" onclick="goHome()">전체</span>
           <span class="sep">›</span>
+          <span class="current">${state.species}</span>
+        </div>
+        <div class="select-grid">${cardsHtml}</div>
+      `;
+      return;
+    }
+
+    // 2층: 부위 선택
+    if (!state.part){
+      const parts = MANIFEST[state.species][state.brand];
+      const cardsHtml = Object.keys(parts).map(p => {
+        const obj = parts[p];
+        return `
+          <div class="select-card" onclick="goPart('${state.species}','${state.brand}','${p}')">
+            ${thumbHtml(partThumbUrl(state.species, state.brand, p), `${obj.photos.length}장`)}
+            <div class="body">
+              <div class="name">${obj.displayName}</div>
+              <div class="sub">${state.brand}</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+      main.innerHTML = `
+        <div class="page-breadcrumb">
+          <button class="back-btn" onclick="goSpecies('${state.species}')">← 뒤로</button>
+          <span class="crumb" onclick="goHome()">전체</span>
+          <span class="sep">›</span>
+          <span class="crumb" onclick="goSpecies('${state.species}')">${state.species}</span>
+          <span class="sep">›</span>
           <span class="current">${state.brand}</span>
         </div>
         <div class="select-grid">${cardsHtml}</div>
@@ -675,8 +794,72 @@
       return;
     }
 
-    // 3층: 사진 + 정보
-    const obj = MANIFEST[state.brand][state.part];
+    const obj = getObj();
+    const allBatches = batchesWithOffset(obj);
+    const breadcrumbHead = `
+      <span class="crumb" onclick="goHome()">전체</span>
+      <span class="sep">›</span>
+      <span class="crumb" onclick="goSpecies('${state.species}')">${state.species}</span>
+      <span class="sep">›</span>
+      <span class="crumb" onclick="goBrand('${state.species}','${state.brand}')">${state.brand}</span>
+      <span class="sep">›</span>
+      <span class="crumb" onclick="goPart('${state.species}','${state.brand}','${state.part}')">${obj.displayName}</span>
+    `;
+
+    // 3층: EST 선택 (한 부위 안에 EST가 2개 이상 섞여 있을 때만 등장, 아니면 자동 통과)
+    const estOptions = distinctValues(allBatches, 'EST');
+    if (estOptions.length > 1 && !state.est){
+      const cardsHtml = estOptions.map(est => {
+        const matched = allBatches.filter(b => String(b.EST) === est);
+        return `
+          <div class="select-card" onclick="goEst('${state.species}','${state.brand}','${state.part}','${est}')">
+            ${thumbHtml(optionThumb(obj, matched), `${optionPhotoCount(matched)}장`)}
+            <div class="body">
+              <div class="name">EST ${est}</div>
+              <div class="sub">${obj.displayName}</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+      main.innerHTML = `
+        <div class="page-breadcrumb">
+          <button class="back-btn" onclick="goBrand('${state.species}','${state.brand}')">← 뒤로</button>
+          ${breadcrumbHead}
+        </div>
+        <div class="select-grid">${cardsHtml}</div>
+      `;
+      return;
+    }
+
+    // 4층: 등급 선택 (EST 확정 후, 등급이 2개 이상 섞여 있을 때만 등장)
+    const estFiltered = allBatches.filter(b => !state.est || String(b.EST) === state.est);
+    const gradeOptions = distinctValues(estFiltered, '등급');
+    if (gradeOptions.length > 1 && !state.grade){
+      const cardsHtml = gradeOptions.map(grade => {
+        const matched = estFiltered.filter(b => b['등급'] === grade);
+        return `
+          <div class="select-card" onclick="goGrade('${state.species}','${state.brand}','${state.part}','${state.est||''}','${grade}')">
+            ${thumbHtml(optionThumb(obj, matched), `${optionPhotoCount(matched)}장`)}
+            <div class="body">
+              <div class="name">등급 ${grade}</div>
+              <div class="sub">${state.est ? 'EST ' + state.est : obj.displayName}</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+      main.innerHTML = `
+        <div class="page-breadcrumb">
+          <button class="back-btn" onclick="goPart('${state.species}','${state.brand}','${state.part}')">← 뒤로</button>
+          ${breadcrumbHead}
+          ${state.est ? `<span class="sep">›</span><span class="crumb" onclick="goEst('${state.species}','${state.brand}','${state.part}','${state.est}')">EST ${state.est}</span>` : ''}
+        </div>
+        <div class="select-grid">${cardsHtml}</div>
+      `;
+      return;
+    }
+
+    // 5층: 사진 + 정보 (EST/등급까지 확정된, 혹은 애초에 구분이 필요 없던 최종 상태)
+    const finalBatches = estFiltered.filter(b => !state.grade || b['등급'] === state.grade);
 
     function photoCell(url, i){
       return `
@@ -705,15 +888,12 @@
     }
 
     let bodyHtml;
+    let totalCount;
     if (Array.isArray(obj.batches)){
-      // 배치(ERP) 구조: 부위 안에서 자재명/BL/EST/등급 단위로 섹션을 나눠서 표시
-      let cursor = 0;
-      const sections = obj.batches.map((b, bi) => {
-        const start = cursor;
-        const count = b.photoCount || 0;
-        cursor += count;
-        const cellsHtml = obj.photos.slice(start, start + count)
-          .map((url, j) => photoCell(url, start + j)).join('');
+      // 배치(ERP) 구조: EST/등급까지 좁혀진 배치들만 자재명/BL 단위로 섹션을 나눠서 표시
+      const sections = finalBatches.map((b) => {
+        const cellsHtml = obj.photos.slice(b._start, b._start + (b.photoCount||0))
+          .map((url, j) => photoCell(url, b._start + j)).join('');
         return `
           <div class="batch-section">
             <div class="batch-header">
@@ -726,6 +906,7 @@
         `;
       }).join('');
       bodyHtml = sections;
+      totalCount = optionPhotoCount(finalBatches);
     } else if (obj.sample){
       // 샘플(ERP 정보 없음): 사진만, 안내 배지만 표시
       const cellsHtml = obj.photos.map((url, i) => photoCell(url, i)).join('');
@@ -733,6 +914,7 @@
         <div class="sample-badge">샘플 — ${obj.note || 'ERP 정보 없음'}</div>
         <div class="photo-grid">${cellsHtml}</div>
       `;
+      totalCount = obj.photos.length;
     } else {
       // 레거시: 부위 전체에 정보 한 블록 (기존 방식 그대로)
       const cellsHtml = obj.photos.map((url, i) => photoCell(url, i)).join('');
@@ -740,16 +922,24 @@
         <div class="row"><span class="k">${k}</span><span class="v">${NUMERIC_FIELDS.has(k) ? fmtQty(v) : v}</span></div>
       `).join('');
       bodyHtml = `<div class="photo-grid">${cellsHtml}</div><div class="detail-info">${infoHtml}</div>`;
+      totalCount = obj.photos.length;
+    }
+
+    let backOnclick;
+    if (state.grade && estOptions.length > 1 || state.grade && gradeOptions.length > 1){
+      backOnclick = `goEst('${state.species}','${state.brand}','${state.part}','${state.est||''}')`;
+    } else if (state.est && estOptions.length > 1){
+      backOnclick = `goPart('${state.species}','${state.brand}','${state.part}')`;
+    } else {
+      backOnclick = `goBrand('${state.species}','${state.brand}')`;
     }
 
     main.innerHTML = `
       <div class="page-breadcrumb">
-        <button class="back-btn" onclick="goBrand('${state.brand}')">← 뒤로</button>
-        <span class="crumb" onclick="goHome()">전체</span>
-        <span class="sep">›</span>
-        <span class="crumb" onclick="goBrand('${state.brand}')">${state.brand}</span>
-        <span class="sep">›</span>
-        <span class="current">${obj.displayName}</span>
+        <button class="back-btn" onclick="${backOnclick}">← 뒤로</button>
+        ${breadcrumbHead}
+        ${state.est ? `<span class="sep">›</span><span class="crumb" onclick="goEst('${state.species}','${state.brand}','${state.part}','${state.est}')">EST ${state.est}</span>` : ''}
+        ${state.grade ? `<span class="sep">›</span><span class="current">등급 ${state.grade}</span>` : ''}
       </div>
       <div class="action-row">
         <button class="download-all-btn secondary" onclick="copyPageLink(this)">
@@ -758,7 +948,7 @@
         </button>
         <button class="download-all-btn" onclick="downloadAll()">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 3v12"/><path d="M6 11l6 6 6-6"/><path d="M5 21h14"/></svg>
-          전체 ${obj.photos.length}장 다운로드
+          전체 ${totalCount}장 다운로드
         </button>
       </div>
       ${bodyHtml}
@@ -775,7 +965,7 @@
 
   // 사진 한 장만 표시하고, 넘길 때 슬라이드 애니메이션 없이 바로 교체한다.
   function showSlide(idx){
-    const photos = MANIFEST[state.brand][state.part].photos;
+    const photos = getObj().photos;
     lightboxIndex = idx;
     const img = document.getElementById('lightbox-img');
     img.src = photos[idx];
@@ -792,14 +982,14 @@
 
   // 좌우 넘기기 버튼 (지마켓 상품 이미지처럼) - 슬라이드 애니메이션 없이 바로 다음/이전 사진으로 교체
   function lightboxNav(delta){
-    const photos = MANIFEST[state.brand][state.part].photos;
+    const photos = getObj().photos;
     const idx = Math.max(0, Math.min(photos.length - 1, lightboxIndex + delta));
     if (idx === lightboxIndex) return;
     showSlide(idx);
   }
 
   function updateNavButtons(){
-    const photos = MANIFEST[state.brand][state.part].photos;
+    const photos = getObj().photos;
     document.getElementById('lightbox-prev-btn').classList.toggle('disabled', lightboxIndex <= 0);
     document.getElementById('lightbox-next-btn').classList.toggle('disabled', lightboxIndex >= photos.length - 1);
   }
@@ -810,7 +1000,7 @@
   }
 
   function updateLightboxCounter(){
-    const photos = MANIFEST[state.brand][state.part].photos;
+    const photos = getObj().photos;
     document.getElementById('lightbox-counter').textContent = `${lightboxIndex+1} / ${photos.length}`;
   }
 
@@ -966,7 +1156,7 @@
 
   function lightboxDownload(e){
     e.stopPropagation();
-    const photos = MANIFEST[state.brand][state.part].photos;
+    const photos = getObj().photos;
     downloadPhoto(photos[lightboxIndex], lightboxIndex, document.getElementById('lightbox-dl-btn'));
   }
 
@@ -1075,7 +1265,7 @@
 
   // 전체 다운로드 (배치 중엔 새 탭을 띄우지 않고, 끝나고 실패 목록만 안내)
   async function downloadAll(){
-    const obj = MANIFEST[state.brand][state.part];
+    const obj = getObj();
     showToast(`${obj.photos.length}장 다운로드를 시작합니다`);
     const failed = [];
     for (let i = 0; i < obj.photos.length; i++){
