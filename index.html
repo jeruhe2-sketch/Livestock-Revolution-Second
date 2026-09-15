@@ -637,7 +637,7 @@
       return Object.assign({}, b, { _start: start, EST: normMultiVal(b.EST) });
     });
   }
-  // "2025.03.15" 같은 날짜 문자열을 정렬 가능한 숫자로 변환. 날짜가 없으면 맨 뒤로.
+  // "2025.03.15" 같은 날짜 문자열을 정렬 가능한 숫자로 변환. 날짜가 없으면 항상 맨 뒤로.
   function dateSortKey(str){
     if (!str) return Infinity;
     const m = String(str).match(/(\d{4})[.\-\/](\d{1,2})[.\-\/](\d{1,2})/);
@@ -646,20 +646,41 @@
   }
   // 배치의 대표 날짜: 선적일(수입) 우선, 없으면 입고일(내수)
   function batchDate(b){ return b['선적일'] || b['입고일'] || null; }
+  // 기본은 최신(늦은) 선적일이 먼저 오는 내림차순. 날짜 없는 항목은 정렬방향과 무관하게 항상 맨 뒤.
   function sortByDate(batches){
-    return [...batches].sort((a, b) => dateSortKey(batchDate(a)) - dateSortKey(batchDate(b)));
+    return [...batches].sort((a, b) => {
+      const ka = dateSortKey(batchDate(a)), kb = dateSortKey(batchDate(b));
+      if (ka === Infinity && kb === Infinity) return 0;
+      if (ka === Infinity) return 1;
+      if (kb === Infinity) return -1;
+      return kb - ka;
+    });
   }
   function distinctValues(batches, key, filterFn){
     const set = new Set();
     batches.forEach(b => { if ((!filterFn || filterFn(b)) && b[key]) set.add(String(b[key])); });
     return [...set];
   }
-  // 옵션(EST/등급/BL) 카드를 그 값에 해당하는 배치들 중 가장 이른 선적일 기준으로 정렬
-  function sortedOptionValues(batches, key){
+  // BL 카드용: 그 값에 해당하는 배치들 중 가장 최신 선적일 기준으로 내림차순 정렬
+  function sortedValuesByDate(batches, key){
     const values = distinctValues(batches, key);
     return values
       .map(v => ({ v, batches: batches.filter(b => String(b[key]) === v) }))
-      .sort((a, b) => dateSortKey(batchDate(sortByDate(a.batches)[0])) - dateSortKey(batchDate(sortByDate(b.batches)[0])))
+      .sort((a, b) => {
+        const ka = dateSortKey(batchDate(sortByDate(a.batches)[0])), kb = dateSortKey(batchDate(sortByDate(b.batches)[0]));
+        if (ka === Infinity && kb === Infinity) return 0;
+        if (ka === Infinity) return 1;
+        if (kb === Infinity) return -1;
+        return kb - ka;
+      })
+      .map(x => x.v);
+  }
+  // EST/등급처럼 상위 단계 카드용: 사진이 많은 순(내림차순)으로 정렬
+  function sortedValuesByPhotoCount(batches, key){
+    const values = distinctValues(batches, key);
+    return values
+      .map(v => ({ v, count: batches.filter(b => String(b[key]) === v).reduce((s,b) => s + (b.photoCount||0), 0) }))
+      .sort((a, b) => b.count - a.count)
       .map(x => x.v);
   }
   function optionThumb(obj, batches){
@@ -676,7 +697,8 @@
     // 0층: 축종 선택
     if (!state.species){
       renderBreadcrumb(null, []);
-      const cardsHtml = SPECIES_LIST.map(sp => {
+      const speciesSorted = [...SPECIES_LIST].sort((a, b) => speciesPhotoCount(b) - speciesPhotoCount(a));
+      const cardsHtml = speciesSorted.map(sp => {
         const n = speciesBrandCount(sp);
         if (n === 0){
           return `
@@ -709,7 +731,8 @@
         { label: '전체', onclick: `goHome()` },
         { label: state.species },
       ]);
-      const brands = Object.keys(speciesBrands(state.species));
+      const brands = Object.keys(speciesBrands(state.species))
+        .sort((a, b) => brandPhotoCount(state.species, b) - brandPhotoCount(state.species, a));
       if (brands.length === 0){
         main.innerHTML = `<div class="empty-state">${state.species} 사진은 아직 준비중입니다</div>`;
         return;
@@ -739,7 +762,8 @@
         { label: state.brand },
       ]);
       const parts = MANIFEST[state.species][state.brand];
-      const cardsHtml = Object.keys(parts).map(p => {
+      const partKeys = Object.keys(parts).sort((a, b) => parts[b].photos.length - parts[a].photos.length);
+      const cardsHtml = partKeys.map(p => {
         const obj = parts[p];
         return `
           <div class="select-card" onclick="goPart('${state.species}','${state.brand}','${p}')">
@@ -765,7 +789,7 @@
     ];
 
     // 3층: EST 선택 (한 부위 안에 EST가 2개 이상 섞여 있을 때만 등장, 아니면 자동 통과)
-    const estOptions = sortedOptionValues(allBatches, 'EST');
+    const estOptions = sortedValuesByPhotoCount(allBatches, 'EST');
     if (estOptions.length > 1 && !state.est){
       renderBreadcrumb(`goBrand('${state.species}','${state.brand}')`, crumbBase);
       const cardsHtml = estOptions.map(est => {
@@ -786,7 +810,7 @@
 
     // 4층: 등급 선택 (EST 확정 후, 등급이 2개 이상 섞여 있을 때만 등장)
     const estFiltered = allBatches.filter(b => !state.est || String(b.EST) === state.est);
-    const gradeOptions = sortedOptionValues(estFiltered, '등급');
+    const gradeOptions = sortedValuesByPhotoCount(estFiltered, '등급');
     if (gradeOptions.length > 1 && !state.grade){
       const gradeCrumbs = state.est
         ? [...crumbBase, { label: 'EST ' + state.est, onclick: `goEst('${state.species}','${state.brand}','${state.part}','${state.est}')` }]
@@ -826,7 +850,7 @@
     })();
 
     // 5층: BL 선택 (EST/등급까지 확정한 상태에서 실제 수입 건(BL)이 2개 이상 섞여 있을 때만 등장)
-    const blOptions = sortedOptionValues(gradeFiltered, 'BL');
+    const blOptions = sortedValuesByDate(gradeFiltered, 'BL');
     if (blOptions.length > 1 && !state.bl){
       renderBreadcrumb(blBackTarget, gradeCrumbsForBl);
       const cardsHtml = blOptions.map(bl => {
