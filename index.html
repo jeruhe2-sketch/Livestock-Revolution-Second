@@ -43,8 +43,8 @@
   .mono{ font-family:ui-monospace, 'SF Mono', monospace; }
 
   header{
-    padding: 24px 20px;
-    padding-top: max(24px, env(safe-area-inset-top));
+    padding: 14px 20px;
+    padding-top: max(14px, env(safe-area-inset-top));
     border-bottom: 1px solid var(--line);
     position: sticky;
     top: 0;
@@ -53,78 +53,46 @@
     -webkit-backdrop-filter: blur(10px);
     z-index: 10;
   }
-  .brand-row{ display:flex; align-items:baseline; gap:10px; cursor:pointer; }
-  .brand-row h1{ font-size: 20px; font-weight: 800; margin:0; }
-  .brand-row span{ font-size: 11px; color: var(--sub); font-family:ui-monospace,monospace; }
+  .brand-row{ display:flex; align-items:baseline; gap:8px; cursor:pointer; }
+  .brand-row h1{ font-size: 16px; font-weight: 800; margin:0; }
+  .brand-row span{ font-size: 10px; color: var(--sub); font-family:ui-monospace,monospace; }
 
-  .chip-row{
+  /* 축종/브랜드/부위/EST/등급 경로를 한 줄로 압축한 브레드크럼 (헤더에 고정) */
+  .crumb-bar{
     display:flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 12px;
+    align-items:center;
+    gap:8px;
+    margin-top: 8px;
   }
-  #brand-chips{
-    max-height: 92px;
-    overflow-y: auto;
-    padding-bottom: 2px;
+  .crumb-bar.hidden{ display:none; }
+  .crumb-bar .crumb-scroll{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    flex-wrap: nowrap;
+    overflow-x: auto;
     scrollbar-width: none;
+    font-size: 12.5px;
+    min-width: 0;
   }
-  #brand-chips::-webkit-scrollbar{ display:none; }
-  .chip{
-    flex-shrink:0;
-    padding: 7px 14px;
-    border-radius: 20px;
-    border: 1px solid var(--line);
-    background: var(--card);
-    font-size: 13px;
-    font-weight: 600;
-    cursor:pointer;
-    white-space: nowrap;
-  }
-  .chip .n{ color: var(--sub); font-weight:400; margin-left:4px; font-size:11px; }
-  .chip.active{ background: var(--accent); border-color: var(--accent); color:#fff; }
-  .chip.active .n{ color: rgba(255,255,255,0.75); }
-  .part-chip-row{ margin-top: 8px; }
-  .part-chip-row .chip.active{ background: var(--cold); border-color: var(--cold); }
-  .part-chip-row.hidden{ display:none; }
-
-  .breadcrumb{
-    margin-top: 10px;
-    font-size: 13px;
-    color: var(--sub);
-    display:flex;
-    align-items:center;
-    gap:10px;
-  }
-  .breadcrumb .crumb{ cursor:pointer; color: var(--cold); }
-  .breadcrumb .crumb:hover{ text-decoration: underline; }
-
-  /* 층 구분용 브레드크럼 (main 영역 최상단) */
-  .page-breadcrumb{
-    display:flex;
-    align-items:center;
-    flex-wrap: wrap;
-    gap: 8px;
-    font-size: 13px;
-    color: var(--sub);
-    margin-bottom: 14px;
-  }
-  .page-breadcrumb .crumb{ cursor:pointer; color: var(--cold); font-weight:600; }
-  .page-breadcrumb .crumb:hover{ text-decoration: underline; }
-  .page-breadcrumb .sep{ color: var(--line); }
-  .page-breadcrumb .current{ font-weight:800; color: var(--ink); }
+  .crumb-bar .crumb-scroll::-webkit-scrollbar{ display:none; }
+  .crumb-bar .crumb{ cursor:pointer; color: var(--cold); font-weight:600; white-space:nowrap; flex-shrink:0; }
+  .crumb-bar .crumb:hover{ text-decoration: underline; }
+  .crumb-bar .sep{ color: var(--line); flex-shrink:0; }
+  .crumb-bar .current{ font-weight:800; color: var(--ink); white-space:nowrap; flex-shrink:0; }
   .back-btn{
     display:inline-flex;
     align-items:center;
-    gap:4px;
-    padding: 5px 10px;
+    justify-content:center;
+    width: 26px; height: 26px;
+    flex-shrink:0;
     border: 1px solid var(--line);
     border-radius: 8px;
     background: var(--card);
     cursor: pointer;
-    font-size: 12.5px;
+    font-size: 14px;
     color: var(--ink);
-    font-weight: 600;
+    font-weight: 700;
   }
   .back-btn:hover{ border-color: var(--cold); color: var(--cold); }
 
@@ -183,8 +151,6 @@
   .select-card:hover{ border-color: var(--accent); box-shadow: 0 6px 18px rgba(22,32,28,0.07); transform: translateY(-2px); }
   .select-card.disabled{ cursor: default; opacity: 0.5; }
   .select-card.disabled:hover{ border-color: var(--line); box-shadow: none; transform: none; }
-  .chip.disabled{ cursor: default; opacity: 0.45; }
-  .chip.disabled:hover{ border-color: var(--line); }
   .select-card .thumb{
     position: relative;
     width: 100%;
@@ -418,14 +384,15 @@
 
   /* 모바일 */
   @media (max-width: 640px){
-    header{ padding: 16px 14px; }
-    .brand-row h1{ font-size: 17px; }
+    header{ padding: 10px 14px; }
+    .brand-row h1{ font-size: 15px; }
+    .brand-row span{ font-size: 9px; }
     main{ padding: 12px 14px 40px; }
     .select-grid{ grid-template-columns: repeat(2, 1fr); gap: 10px; }
     .select-card .name{ font-size: 13.5px; }
     .select-card .sub{ font-size: 10.5px; }
     .select-card .body{ padding: 8px 10px 10px; }
-    .page-breadcrumb{ font-size: 12px; margin-bottom: 10px; }
+    .crumb-bar{ font-size: 11.5px; margin-top: 6px; }
     .photo-grid{ grid-template-columns: repeat(3, 1fr); gap:6px; }
     .photo-wrap img{ height: 108px; border-radius: 7px; }
     .download-btn{ width: 26px; height: 26px; bottom:5px; right:5px; }
@@ -443,8 +410,6 @@
     .select-grid{ grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 18px; }
     .photo-grid{ grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 14px; }
     .photo-wrap img{ height: 190px; border-radius: 12px; }
-    .chip{ padding: 8px 16px; font-size: 13.5px; }
-    .chip:hover{ border-color: var(--cold); }
   }
 
   /* 아주 넓은 화면(대형 모니터)에서 카드가 과도하게 커지지 않도록 */
@@ -462,13 +427,7 @@
       <h1>축산 라이브러리</h1>
       <span>PHOTO ARCHIVE</span>
     </div>
-    <div class="chip-row" id="species-chips"></div>
-    <div class="chip-row hidden" id="brand-chips">
-      <div class="skeleton-card" style="width:70px;height:30px;border-radius:20px;flex-shrink:0;"></div>
-      <div class="skeleton-card" style="width:90px;height:30px;border-radius:20px;flex-shrink:0;"></div>
-      <div class="skeleton-card" style="width:60px;height:30px;border-radius:20px;flex-shrink:0;"></div>
-    </div>
-    <div class="chip-row part-chip-row hidden" id="part-chips"></div>
+    <div class="crumb-bar hidden" id="breadcrumb-bar"></div>
   </div>
 </header>
 
@@ -625,41 +584,24 @@
     history.back();
   }
 
-  function renderChips(){
-    const speciesChipsEl = document.getElementById('species-chips');
-    speciesChipsEl.innerHTML = SPECIES_LIST.map(sp => {
-      const active = sp === state.species ? 'active' : '';
-      const n = speciesBrandCount(sp);
-      const disabled = n === 0 ? 'disabled' : '';
-      return `<div class="chip ${active} ${disabled}" onclick="${n ? `goSpecies('${sp}')` : ''}">${sp}${n ? '' : ' (준비중)'}</div>`;
+  // 헤더에 고정된 한 줄 브레드크럼 렌더링. parts: [{label, onclick}], 마지막 항목은 현재 위치(클릭불가)로 표시.
+  function renderBreadcrumb(backOnclick, parts){
+    const bar = document.getElementById('breadcrumb-bar');
+    if (!parts || !parts.length){
+      bar.classList.add('hidden');
+      bar.innerHTML = '';
+      return;
+    }
+    bar.classList.remove('hidden');
+    const segsHtml = parts.map((p, i) => {
+      const isLast = i === parts.length - 1;
+      if (isLast) return `<span class="current">${p.label}</span>`;
+      return `<span class="crumb" onclick="${p.onclick}">${p.label}</span><span class="sep">›</span>`;
     }).join('');
-
-    const brandChipsEl = document.getElementById('brand-chips');
-    if (state.species && speciesBrandCount(state.species) > 0){
-      const brands = Object.keys(speciesBrands(state.species));
-      brandChipsEl.classList.remove('hidden');
-      brandChipsEl.innerHTML = brands.map(b => {
-        const partCount = Object.keys(MANIFEST[state.species][b]).length;
-        const active = b === state.brand ? 'active' : '';
-        return `<div class="chip ${active}" onclick="goBrand('${state.species}','${b}')">${b}<span class="n">${partCount}</span></div>`;
-      }).join('');
-    } else {
-      brandChipsEl.classList.add('hidden');
-      brandChipsEl.innerHTML = '';
-    }
-
-    const partChipsEl = document.getElementById('part-chips');
-    if (state.species && state.brand){
-      const parts = MANIFEST[state.species][state.brand];
-      partChipsEl.classList.remove('hidden');
-      partChipsEl.innerHTML = Object.keys(parts).map(p => {
-        const active = p === state.part ? 'active' : '';
-        return `<div class="chip ${active}" onclick="goPart('${state.species}','${state.brand}','${p}')">${parts[p].displayName}</div>`;
-      }).join('');
-    } else {
-      partChipsEl.classList.add('hidden');
-      partChipsEl.innerHTML = '';
-    }
+    bar.innerHTML = `
+      ${backOnclick ? `<button class="back-btn" onclick="${backOnclick}">←</button>` : ''}
+      <div class="crumb-scroll">${segsHtml}</div>
+    `;
   }
 
   function render(){
@@ -670,13 +612,19 @@
     }
   }
 
+  // EST가 "06-02, 06-06"처럼 여러 코드를 콤마로 묶어놓은 경우, 순서만 달라도
+  // 다른 값으로 취급되지 않도록 정렬해서 정규화 (예: "06-06, 06-02" -> "06-02, 06-06")
+  function normMultiVal(v){
+    if (v === null || v === undefined || v === '') return v;
+    return String(v).split(',').map(s => s.trim()).filter(Boolean).sort().join(', ');
+  }
   // batches 배열에 사진 시작 인덱스(_start)를 계산해서 붙여줌 (전역 photos 배열과의 매핑용)
   function batchesWithOffset(obj){
     let cursor = 0;
     return (obj.batches || []).map(b => {
       const start = cursor;
       cursor += (b.photoCount || 0);
-      return Object.assign({}, b, { _start: start });
+      return Object.assign({}, b, { _start: start, EST: normMultiVal(b.EST) });
     });
   }
   function distinctValues(batches, key, filterFn){
@@ -693,11 +641,11 @@
   }
 
   function renderInner(){
-    renderChips();
     const main = document.getElementById('main');
 
     // 0층: 축종 선택
     if (!state.species){
+      renderBreadcrumb(null, []);
       const cardsHtml = SPECIES_LIST.map(sp => {
         const n = speciesBrandCount(sp);
         if (n === 0){
@@ -727,17 +675,13 @@
 
     // 1층: 브랜드 선택
     if (!state.brand){
+      renderBreadcrumb(`goHome()`, [
+        { label: '전체', onclick: `goHome()` },
+        { label: state.species },
+      ]);
       const brands = Object.keys(speciesBrands(state.species));
       if (brands.length === 0){
-        main.innerHTML = `
-          <div class="page-breadcrumb">
-            <button class="back-btn" onclick="goHome()">← 뒤로</button>
-            <span class="crumb" onclick="goHome()">전체</span>
-            <span class="sep">›</span>
-            <span class="current">${state.species}</span>
-          </div>
-          <div class="empty-state">${state.species} 사진은 아직 준비중입니다</div>
-        `;
+        main.innerHTML = `<div class="empty-state">${state.species} 사진은 아직 준비중입니다</div>`;
         return;
       }
       const cardsHtml = brands.map(b => {
@@ -753,20 +697,17 @@
           </div>
         `;
       }).join('');
-      main.innerHTML = `
-        <div class="page-breadcrumb">
-          <button class="back-btn" onclick="goHome()">← 뒤로</button>
-          <span class="crumb" onclick="goHome()">전체</span>
-          <span class="sep">›</span>
-          <span class="current">${state.species}</span>
-        </div>
-        <div class="select-grid">${cardsHtml}</div>
-      `;
+      main.innerHTML = `<div class="select-grid">${cardsHtml}</div>`;
       return;
     }
 
     // 2층: 부위 선택
     if (!state.part){
+      renderBreadcrumb(`goSpecies('${state.species}')`, [
+        { label: '전체', onclick: `goHome()` },
+        { label: state.species, onclick: `goSpecies('${state.species}')` },
+        { label: state.brand },
+      ]);
       const parts = MANIFEST[state.species][state.brand];
       const cardsHtml = Object.keys(parts).map(p => {
         const obj = parts[p];
@@ -780,35 +721,23 @@
           </div>
         `;
       }).join('');
-      main.innerHTML = `
-        <div class="page-breadcrumb">
-          <button class="back-btn" onclick="goSpecies('${state.species}')">← 뒤로</button>
-          <span class="crumb" onclick="goHome()">전체</span>
-          <span class="sep">›</span>
-          <span class="crumb" onclick="goSpecies('${state.species}')">${state.species}</span>
-          <span class="sep">›</span>
-          <span class="current">${state.brand}</span>
-        </div>
-        <div class="select-grid">${cardsHtml}</div>
-      `;
+      main.innerHTML = `<div class="select-grid">${cardsHtml}</div>`;
       return;
     }
 
     const obj = getObj();
     const allBatches = batchesWithOffset(obj);
-    const breadcrumbHead = `
-      <span class="crumb" onclick="goHome()">전체</span>
-      <span class="sep">›</span>
-      <span class="crumb" onclick="goSpecies('${state.species}')">${state.species}</span>
-      <span class="sep">›</span>
-      <span class="crumb" onclick="goBrand('${state.species}','${state.brand}')">${state.brand}</span>
-      <span class="sep">›</span>
-      <span class="crumb" onclick="goPart('${state.species}','${state.brand}','${state.part}')">${obj.displayName}</span>
-    `;
+    const crumbBase = [
+      { label: '전체', onclick: `goHome()` },
+      { label: state.species, onclick: `goSpecies('${state.species}')` },
+      { label: state.brand, onclick: `goBrand('${state.species}','${state.brand}')` },
+      { label: obj.displayName, onclick: `goPart('${state.species}','${state.brand}','${state.part}')` },
+    ];
 
     // 3층: EST 선택 (한 부위 안에 EST가 2개 이상 섞여 있을 때만 등장, 아니면 자동 통과)
     const estOptions = distinctValues(allBatches, 'EST');
     if (estOptions.length > 1 && !state.est){
+      renderBreadcrumb(`goBrand('${state.species}','${state.brand}')`, crumbBase);
       const cardsHtml = estOptions.map(est => {
         const matched = allBatches.filter(b => String(b.EST) === est);
         return `
@@ -821,13 +750,7 @@
           </div>
         `;
       }).join('');
-      main.innerHTML = `
-        <div class="page-breadcrumb">
-          <button class="back-btn" onclick="goBrand('${state.species}','${state.brand}')">← 뒤로</button>
-          ${breadcrumbHead}
-        </div>
-        <div class="select-grid">${cardsHtml}</div>
-      `;
+      main.innerHTML = `<div class="select-grid">${cardsHtml}</div>`;
       return;
     }
 
@@ -835,6 +758,13 @@
     const estFiltered = allBatches.filter(b => !state.est || String(b.EST) === state.est);
     const gradeOptions = distinctValues(estFiltered, '등급');
     if (gradeOptions.length > 1 && !state.grade){
+      const gradeCrumbs = state.est
+        ? [...crumbBase, { label: 'EST ' + state.est, onclick: `goEst('${state.species}','${state.brand}','${state.part}','${state.est}')` }]
+        : crumbBase;
+      const gradeBack = estOptions.length > 1
+        ? `goEst('${state.species}','${state.brand}','${state.part}','${state.est}')`
+        : `goPart('${state.species}','${state.brand}','${state.part}')`;
+      renderBreadcrumb(gradeBack, gradeCrumbs);
       const cardsHtml = gradeOptions.map(grade => {
         const matched = estFiltered.filter(b => b['등급'] === grade);
         return `
@@ -847,14 +777,7 @@
           </div>
         `;
       }).join('');
-      main.innerHTML = `
-        <div class="page-breadcrumb">
-          <button class="back-btn" onclick="goPart('${state.species}','${state.brand}','${state.part}')">← 뒤로</button>
-          ${breadcrumbHead}
-          ${state.est ? `<span class="sep">›</span><span class="crumb" onclick="goEst('${state.species}','${state.brand}','${state.part}','${state.est}')">EST ${state.est}</span>` : ''}
-        </div>
-        <div class="select-grid">${cardsHtml}</div>
-      `;
+      main.innerHTML = `<div class="select-grid">${cardsHtml}</div>`;
       return;
     }
 
@@ -881,7 +804,7 @@
     const NUMERIC_FIELDS = new Set(['수량(BOX)','중량(KG)','재고수량','중량(kg)']);
 
     // 배치 정보 한 줄 요약에 쓸 필드 순서 (자재명/BL/EST/등급을 우선 노출)
-    const BATCH_FIELD_ORDER = ['자재명','BL','EST','등급','원산지','창고','구매처','수량(BOX)','중량(KG)','선적일','입고일','통관일','유통기한','유통이력번호','비고'];
+    const BATCH_FIELD_ORDER = ['자재명','BL','EST','등급','원산지','창고','구매처','수량(BOX)','중량(KG)','선적일','입고일','통관일','유통기한','유통이력번호'];
     function batchInfoRows(b){
       return BATCH_FIELD_ORDER.filter(k => b[k] !== undefined && b[k] !== null && b[k] !== '')
         .map(k => `<div class="row"><span class="k">${k}</span><span class="v">${NUMERIC_FIELDS.has(k) ? fmtQty(b[k]) : b[k]}</span></div>`).join('');
@@ -908,10 +831,10 @@
       bodyHtml = sections;
       totalCount = optionPhotoCount(finalBatches);
     } else if (obj.sample){
-      // 샘플(ERP 정보 없음): 사진만, 안내 배지만 표시
+      // 샘플: 사진은 정상 노출하고, 작은 태그 하나로만 구분 (부족함을 강조하지 않음)
       const cellsHtml = obj.photos.map((url, i) => photoCell(url, i)).join('');
       bodyHtml = `
-        <div class="sample-badge">샘플 — ${obj.note || 'ERP 정보 없음'}</div>
+        <div class="sample-badge">${obj.note || '샘플'}</div>
         <div class="photo-grid">${cellsHtml}</div>
       `;
       totalCount = obj.photos.length;
@@ -925,22 +848,22 @@
       totalCount = obj.photos.length;
     }
 
+    const finalCrumbs = [...crumbBase];
+    if (state.est) finalCrumbs.push({ label: 'EST ' + state.est, onclick: `goEst('${state.species}','${state.brand}','${state.part}','${state.est}')` });
+    if (state.grade) finalCrumbs.push({ label: '등급 ' + state.grade });
+
+    // "뒤로"는 방금 거쳐온 화면(EST/등급 선택이 실제로 있었으면 그쪽으로, 아니면 부위 선택으로)으로 돌아간다
     let backOnclick;
-    if (state.grade && estOptions.length > 1 || state.grade && gradeOptions.length > 1){
+    if (state.grade){
       backOnclick = `goEst('${state.species}','${state.brand}','${state.part}','${state.est||''}')`;
-    } else if (state.est && estOptions.length > 1){
+    } else if (state.est){
       backOnclick = `goPart('${state.species}','${state.brand}','${state.part}')`;
     } else {
       backOnclick = `goBrand('${state.species}','${state.brand}')`;
     }
+    renderBreadcrumb(backOnclick, finalCrumbs);
 
     main.innerHTML = `
-      <div class="page-breadcrumb">
-        <button class="back-btn" onclick="${backOnclick}">← 뒤로</button>
-        ${breadcrumbHead}
-        ${state.est ? `<span class="sep">›</span><span class="crumb" onclick="goEst('${state.species}','${state.brand}','${state.part}','${state.est}')">EST ${state.est}</span>` : ''}
-        ${state.grade ? `<span class="sep">›</span><span class="current">등급 ${state.grade}</span>` : ''}
-      </div>
       <div class="action-row">
         <button class="download-all-btn secondary" onclick="copyPageLink(this)">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
@@ -954,6 +877,7 @@
       ${bodyHtml}
     `;
   }
+
 
   let lightboxIndex = 0;
 

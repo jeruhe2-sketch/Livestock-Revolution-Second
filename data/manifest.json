@@ -64,7 +64,7 @@
         ],
         "batches": [
           {
-            "label": "기존 등록",
+            "label": "가브리",
             "자재명": "가브리",
             "BL": "SNG0504211",
             "EST": "06-02",
@@ -373,7 +373,7 @@
         ],
         "batches": [
           {
-            "label": "기존 등록",
+            "label": "목살",
             "자재명": "목살",
             "BL": "HLCUSCL260617999",
             "EST": "06-02, 06-06",
@@ -851,7 +851,7 @@
         ],
         "batches": [
           {
-            "label": "기존 등록",
+            "label": "CL-작업항정(ASSA)",
             "자재명": "CL-작업항정(ASSA)",
             "BL": "이력912009700678",
             "창고": "신우냉장-서울",
@@ -949,9 +949,9 @@
         ],
         "batches": [
           {
-            "label": "기존 등록",
-            "비고": "ERP 매칭 정보 없음 (기존 등록분)",
-            "photoCount": 11
+            "label": "전지",
+            "photoCount": 11,
+            "자재명": "전지"
           },
           {
             "label": "전지",
@@ -1148,7 +1148,7 @@
         ],
         "batches": [
           {
-            "label": "기존 등록",
+            "label": "등뼈",
             "자재명": "등뼈",
             "BL": "MEDURS230700",
             "EST": "10",
@@ -1937,7 +1937,7 @@
         ],
         "batches": [
           {
-            "label": "기존 등록",
+            "label": "갈비",
             "자재명": "갈비",
             "BL": "MEDUWE206620",
             "EST": "490",
@@ -2013,7 +2013,7 @@
         ],
         "batches": [
           {
-            "label": "기존 등록",
+            "label": "목뼈",
             "자재명": "목뼈",
             "BL": "MAEUJBS310255",
             "EST": "490",
@@ -2195,7 +2195,7 @@
         ],
         "batches": [
           {
-            "label": "기존 등록",
+            "label": "삼겹",
             "자재명": "삼겹",
             "BL": "MEDUWE008323",
             "EST": "490",
@@ -2389,7 +2389,7 @@
         ],
         "batches": [
           {
-            "label": "기존 등록",
+            "label": "전지",
             "자재명": "전지",
             "BL": "HLCUIT1251021138",
             "EST": "490",
@@ -2492,7 +2492,7 @@
           "https://pub-4a7975ff76ef42ed80c2fcfed0ae169e.r2.dev/NOEL/%EC%82%BC%EA%B2%B9/NOEL_%EC%82%BC%EA%B2%B9_batch1_11.jpg"
         ],
         "sample": true,
-        "note": "샘플 (ERP 정보 없음)"
+        "note": "샘플"
       },
       "igyeop": {
         "displayName": "이겹",
@@ -2518,7 +2518,7 @@
           "https://pub-4a7975ff76ef42ed80c2fcfed0ae169e.r2.dev/NOEL/%EC%9D%B4%EA%B2%B9/NOEL_%EC%9D%B4%EA%B2%B9_batch1_19.jpg"
         ],
         "sample": true,
-        "note": "샘플 (ERP 정보 없음)"
+        "note": "샘플"
       },
       "jeonji_2d": {
         "displayName": "전지2D",
@@ -2535,7 +2535,7 @@
           "https://pub-4a7975ff76ef42ed80c2fcfed0ae169e.r2.dev/NOEL/%EC%A0%84%EC%A7%802D/NOEL_%EC%A0%84%EC%A7%802D_batch1_10.jpg"
         ],
         "sample": true,
-        "note": "샘플 (ERP 정보 없음)"
+        "note": "샘플"
       },
       "jeonji_4d": {
         "displayName": "전지4D",
@@ -2554,7 +2554,7 @@
           "https://pub-4a7975ff76ef42ed80c2fcfed0ae169e.r2.dev/NOEL/%EC%A0%84%EC%A7%804D/NOEL_%EC%A0%84%EC%A7%804D_batch1_12.jpg"
         ],
         "sample": true,
-        "note": "샘플 (ERP 정보 없음)"
+        "note": "샘플"
       }
     },
     "GATINE": {
@@ -2979,7 +2979,7 @@
           "https://pub-4a7975ff76ef42ed80c2fcfed0ae169e.r2.dev/MELTIQUE/%EB%93%B1%EC%8B%AC/MELTIQUE_%EB%93%B1%EC%8B%AC_batch1_17.webp"
         ],
         "sample": true,
-        "note": "샘플 (ERP 정보 없음)"
+        "note": "샘플"
       },
       "salchi": {
         "displayName": "살치",
@@ -2997,7 +2997,7 @@
           "https://pub-4a7975ff76ef42ed80c2fcfed0ae169e.r2.dev/MELTIQUE/%EC%82%B4%EC%B9%98/MELTIQUE_%EC%82%B4%EC%B9%98_batch1_11.webp"
         ],
         "sample": true,
-        "note": "샘플 (ERP 정보 없음)"
+        "note": "샘플"
       },
       "udun": {
         "displayName": "우둔",
@@ -3022,7 +3022,7 @@
           "https://pub-4a7975ff76ef42ed80c2fcfed0ae169e.r2.dev/MELTIQUE/%EC%9A%B0%EB%91%94/MELTIQUE_%EC%9A%B0%EB%91%94_batch1_18.webp"
         ],
         "sample": true,
-        "note": "샘플 (ERP 정보 없음)"
+        "note": "샘플"
       },
       "chaekkeut": {
         "displayName": "채끝",
@@ -3046,7 +3046,7 @@
           "https://pub-4a7975ff76ef42ed80c2fcfed0ae169e.r2.dev/MELTIQUE/%EC%B1%84%EB%81%9D/MELTIQUE_%EC%B1%84%EB%81%9D_batch1_17.webp"
         ],
         "sample": true,
-        "note": "샘플 (ERP 정보 없음)"
+        "note": "샘플"
       }
     }
   },
