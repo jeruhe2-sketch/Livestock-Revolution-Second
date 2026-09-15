@@ -278,6 +278,35 @@
 
   .empty-state{ text-align:center; padding: 60px 20px; color: var(--sub); }
 
+  /* 배치(ERP) 섹션 — 부위 안에서 자재명/BL/EST/등급 단위로 구분 */
+  .batch-section{
+    margin-top: 22px;
+    padding-top: 18px;
+    border-top: 2px solid var(--line);
+  }
+  .batch-section:first-of-type{ margin-top: 16px; border-top: none; padding-top: 0; }
+  .batch-header{
+    display:flex; align-items:baseline; gap:10px; flex-wrap:wrap;
+    margin-bottom: 4px;
+  }
+  .batch-title{ font-size: 15px; font-weight: 800; color: var(--ink); }
+  .batch-bl{
+    font-size: 12px; font-family: ui-monospace,monospace; color: var(--sub);
+    background: var(--card); border: 1px solid var(--line); border-radius: 6px;
+    padding: 2px 7px;
+  }
+  .detail-info.batch-info{ margin-top: 10px; padding: 12px 16px; }
+
+  .sample-badge{
+    display:inline-block;
+    font-size: 12.5px; font-weight: 700; color: var(--cold);
+    background: rgba(51,88,107,0.10);
+    border: 1px solid var(--cold);
+    border-radius: 999px;
+    padding: 4px 12px;
+    margin-top: 14px;
+  }
+
   /* 라이트박스 */
   .lightbox{
     position: fixed; inset: 0; z-index: 100;
@@ -648,17 +677,61 @@
 
     // 3층: 사진 + 정보
     const obj = MANIFEST[state.brand][state.part];
-    const photoHtml = obj.photos.map((url, i) => `
+
+    function photoCell(url, i){
+      return `
       <div class="photo-wrap skeleton-thumb">
         <img src="${toThumbUrl(url)}" onclick="openLightbox(${i})" onload="this.parentElement.classList.add('loaded')" onerror="this.parentElement.classList.add('loaded')">
         <button class="download-btn" onclick="downloadPhoto('${url}', ${i}, this)" title="다운로드">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2"><path d="M12 3v12"/><path d="M6 11l6 6 6-6"/><path d="M5 21h14"/></svg>
         </button>
-      </div>
-    `).join('');
-    const infoHtml = Object.entries(obj.info).map(([k,v]) => `
-      <div class="row"><span class="k">${k}</span><span class="v">${v}</span></div>
-    `).join('');
+      </div>`;
+    }
+
+    // 배치 정보 한 줄 요약에 쓸 필드 순서 (자재명/BL/EST/등급을 우선 노출)
+    const BATCH_FIELD_ORDER = ['자재명','BL','EST','등급','원산지','창고','구매처','수량(BOX)','중량(KG)','선적일','입고일','통관일','유통기한','유통이력번호','비고'];
+    function batchInfoRows(b){
+      return BATCH_FIELD_ORDER.filter(k => b[k] !== undefined && b[k] !== null && b[k] !== '')
+        .map(k => `<div class="row"><span class="k">${k}</span><span class="v">${b[k]}</span></div>`).join('');
+    }
+
+    let bodyHtml;
+    if (Array.isArray(obj.batches)){
+      // 배치(ERP) 구조: 부위 안에서 자재명/BL/EST/등급 단위로 섹션을 나눠서 표시
+      let cursor = 0;
+      const sections = obj.batches.map((b, bi) => {
+        const start = cursor;
+        const count = b.photoCount || 0;
+        cursor += count;
+        const cellsHtml = obj.photos.slice(start, start + count)
+          .map((url, j) => photoCell(url, start + j)).join('');
+        return `
+          <div class="batch-section">
+            <div class="batch-header">
+              <span class="batch-title">${b.label || obj.displayName}</span>
+              ${b.BL ? `<span class="batch-bl">BL ${b.BL}</span>` : ''}
+            </div>
+            <div class="photo-grid">${cellsHtml}</div>
+            <div class="detail-info batch-info">${batchInfoRows(b)}</div>
+          </div>
+        `;
+      }).join('');
+      bodyHtml = sections;
+    } else if (obj.sample){
+      // 샘플(ERP 정보 없음): 사진만, 안내 배지만 표시
+      const cellsHtml = obj.photos.map((url, i) => photoCell(url, i)).join('');
+      bodyHtml = `
+        <div class="sample-badge">샘플 — ${obj.note || 'ERP 정보 없음'}</div>
+        <div class="photo-grid">${cellsHtml}</div>
+      `;
+    } else {
+      // 레거시: 부위 전체에 정보 한 블록 (기존 방식 그대로)
+      const cellsHtml = obj.photos.map((url, i) => photoCell(url, i)).join('');
+      const infoHtml = Object.entries(obj.info || {}).map(([k,v]) => `
+        <div class="row"><span class="k">${k}</span><span class="v">${v}</span></div>
+      `).join('');
+      bodyHtml = `<div class="photo-grid">${cellsHtml}</div><div class="detail-info">${infoHtml}</div>`;
+    }
 
     main.innerHTML = `
       <div class="page-breadcrumb">
@@ -669,7 +742,6 @@
         <span class="sep">›</span>
         <span class="current">${obj.displayName}</span>
       </div>
-      <div class="photo-grid">${photoHtml}</div>
       <div class="action-row">
         <button class="download-all-btn secondary" onclick="copyPageLink(this)">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
@@ -680,7 +752,7 @@
           전체 ${obj.photos.length}장 다운로드
         </button>
       </div>
-      <div class="detail-info">${infoHtml}</div>
+      ${bodyHtml}
     `;
   }
 
