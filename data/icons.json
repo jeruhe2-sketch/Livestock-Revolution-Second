@@ -1,5 +1,5 @@
 {
-  "note": "species: Wikipedia 실사진. brands: 15개 중 13개 실제 공식 로고 확보 완료(AGROSUPER/SEABOARD/OLYMEL/SEARA/MARFRIG는 Wikipedia, BAUCELLS/NOEL/AVINYO/MAFRIGES/FRIBIN/PATEL/RIVASAM는 사용자 제공). 남은 GATINE/ACC/MELTIQUE만 워드마크 배지. parts: 부위별 정형도(구역 강조, 근사치).",
+  "note": "species: Wikipedia 실사진. brands: 15개 전 브랜드 실제 공식 로고 확보 완료(사용자 제공). parts: 부위별 정형도(구역 강조, 근사치 — 필요시 재검증).",
   "species": {
     "돈육": "https://pub-4a7975ff76ef42ed80c2fcfed0ae169e.r2.dev/_icons/species/돈육.jpg",
     "우육": "https://pub-4a7975ff76ef42ed80c2fcfed0ae169e.r2.dev/_icons/species/우육.jpg",
@@ -18,9 +18,9 @@
     "AVINYO": "https://pub-4a7975ff76ef42ed80c2fcfed0ae169e.r2.dev/_icons/brands/AVINYO.jpg",
     "SEARA": "https://pub-4a7975ff76ef42ed80c2fcfed0ae169e.r2.dev/_icons/brands/SEARA.jpg",
     "NOEL": "https://pub-4a7975ff76ef42ed80c2fcfed0ae169e.r2.dev/_icons/brands/NOEL.jpg",
-    "GATINE": "https://pub-4a7975ff76ef42ed80c2fcfed0ae169e.r2.dev/_icons/brands/GATINE.svg",
-    "ACC": "https://pub-4a7975ff76ef42ed80c2fcfed0ae169e.r2.dev/_icons/brands/ACC.svg",
-    "MELTIQUE": "https://pub-4a7975ff76ef42ed80c2fcfed0ae169e.r2.dev/_icons/brands/MELTIQUE.svg"
+    "GATINE": "https://pub-4a7975ff76ef42ed80c2fcfed0ae169e.r2.dev/_icons/brands/GATINE.jpg",
+    "ACC": "https://pub-4a7975ff76ef42ed80c2fcfed0ae169e.r2.dev/_icons/brands/ACC.jpg",
+    "MELTIQUE": "https://pub-4a7975ff76ef42ed80c2fcfed0ae169e.r2.dev/_icons/brands/MELTIQUE.jpg"
   },
   "parts": {
     "돈육|gabri_11": "https://pub-4a7975ff76ef42ed80c2fcfed0ae169e.r2.dev/_icons/parts/돈육/gabri_11.svg",
