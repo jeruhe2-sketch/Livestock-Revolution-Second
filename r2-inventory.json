@@ -9542,24 +9542,10 @@
             "StorageClass": "STANDARD"
         },
         {
-            "Key": "_icons/brands/ACC.svg",
-            "LastModified": "2026-09-16T04:41:32.246000+00:00",
-            "ETag": "\"5843ba53dabdd17629eb5bfdc0f85cc2\"",
-            "Size": 468,
-            "StorageClass": "STANDARD"
-        },
-        {
             "Key": "_icons/brands/AGROSUPER.jpg",
             "LastModified": "2026-09-16T04:41:32.270000+00:00",
             "ETag": "\"8b40b23974d2fe84b2d3b00453ab7c10\"",
             "Size": 18988,
-            "StorageClass": "STANDARD"
-        },
-        {
-            "Key": "_icons/brands/AGROSUPER.svg",
-            "LastModified": "2026-09-16T04:13:06.743000+00:00",
-            "ETag": "\"b532f630d2d79811a46e2279ab4619d1\"",
-            "Size": 529,
             "StorageClass": "STANDARD"
         },
         {
@@ -9570,24 +9556,10 @@
             "StorageClass": "STANDARD"
         },
         {
-            "Key": "_icons/brands/AVINYO.svg",
-            "LastModified": "2026-09-16T04:41:32.191000+00:00",
-            "ETag": "\"1d09b51adf4a2da4ded0a14cd631895e\"",
-            "Size": 471,
-            "StorageClass": "STANDARD"
-        },
-        {
             "Key": "_icons/brands/BAUCELLS.jpg",
             "LastModified": "2026-09-16T05:17:01.758000+00:00",
             "ETag": "\"2232f0752b5bf9a603070b2a1525402a\"",
             "Size": 9559,
-            "StorageClass": "STANDARD"
-        },
-        {
-            "Key": "_icons/brands/BAUCELLS.svg",
-            "LastModified": "2026-09-16T04:41:32.437000+00:00",
-            "ETag": "\"e3ae06e407b2069707d61b54459a4c59\"",
-            "Size": 473,
             "StorageClass": "STANDARD"
         },
         {
@@ -9598,24 +9570,10 @@
             "StorageClass": "STANDARD"
         },
         {
-            "Key": "_icons/brands/FRIBIN.svg",
-            "LastModified": "2026-09-16T04:41:32.196000+00:00",
-            "ETag": "\"3fa94c00d1eceab9d18beb0956475668\"",
-            "Size": 471,
-            "StorageClass": "STANDARD"
-        },
-        {
             "Key": "_icons/brands/GATINE.jpg",
             "LastModified": "2026-09-16T05:22:25.195000+00:00",
             "ETag": "\"b9b4c21baa498162e8623c63cab0ee2d\"",
             "Size": 12041,
-            "StorageClass": "STANDARD"
-        },
-        {
-            "Key": "_icons/brands/GATINE.svg",
-            "LastModified": "2026-09-16T04:41:32.233000+00:00",
-            "ETag": "\"fdf5be090f71478db7f551be83d8febe\"",
-            "Size": 471,
             "StorageClass": "STANDARD"
         },
         {
@@ -9626,24 +9584,10 @@
             "StorageClass": "STANDARD"
         },
         {
-            "Key": "_icons/brands/MAFRIGES.svg",
-            "LastModified": "2026-09-16T04:41:32.166000+00:00",
-            "ETag": "\"972e49fa2d6ad099d790aecb1c35949b\"",
-            "Size": 473,
-            "StorageClass": "STANDARD"
-        },
-        {
             "Key": "_icons/brands/MARFRIG.jpg",
             "LastModified": "2026-09-16T04:41:32.193000+00:00",
             "ETag": "\"fe6268d08b40e2ee880421165078e38d\"",
             "Size": 11337,
-            "StorageClass": "STANDARD"
-        },
-        {
-            "Key": "_icons/brands/MARFRIG.svg",
-            "LastModified": "2026-09-16T04:13:06.771000+00:00",
-            "ETag": "\"615e04b181ed23505a7ebbb3634387ce\"",
-            "Size": 527,
             "StorageClass": "STANDARD"
         },
         {
@@ -9654,24 +9598,10 @@
             "StorageClass": "STANDARD"
         },
         {
-            "Key": "_icons/brands/MELTIQUE.svg",
-            "LastModified": "2026-09-16T04:41:32.197000+00:00",
-            "ETag": "\"9a985997263aea39183075f391a5de24\"",
-            "Size": 473,
-            "StorageClass": "STANDARD"
-        },
-        {
             "Key": "_icons/brands/NOEL.jpg",
             "LastModified": "2026-09-16T05:17:02.532000+00:00",
             "ETag": "\"e5eb18dcd5a39ffc518d78a02ce39863\"",
             "Size": 19263,
-            "StorageClass": "STANDARD"
-        },
-        {
-            "Key": "_icons/brands/NOEL.svg",
-            "LastModified": "2026-09-16T04:41:32.282000+00:00",
-            "ETag": "\"60c96afa6df235bcb39dd67cb32b9f0d\"",
-            "Size": 469,
             "StorageClass": "STANDARD"
         },
         {
@@ -9682,24 +9612,10 @@
             "StorageClass": "STANDARD"
         },
         {
-            "Key": "_icons/brands/OLYMEL.svg",
-            "LastModified": "2026-09-16T04:13:07.528000+00:00",
-            "ETag": "\"9c0d8e0118e0746ff2ded93d3b2747db\"",
-            "Size": 526,
-            "StorageClass": "STANDARD"
-        },
-        {
             "Key": "_icons/brands/PATEL.jpg",
             "LastModified": "2026-09-16T05:17:01.702000+00:00",
             "ETag": "\"cbef0768745afab83593e514501f0a67\"",
             "Size": 9418,
-            "StorageClass": "STANDARD"
-        },
-        {
-            "Key": "_icons/brands/PATEL.svg",
-            "LastModified": "2026-09-16T04:41:32.637000+00:00",
-            "ETag": "\"66a18d5ce9d4fac0afeeecd0a05e03fd\"",
-            "Size": 470,
             "StorageClass": "STANDARD"
         },
         {
@@ -9710,13 +9626,6 @@
             "StorageClass": "STANDARD"
         },
         {
-            "Key": "_icons/brands/RIVASAM.svg",
-            "LastModified": "2026-09-16T04:41:32.683000+00:00",
-            "ETag": "\"ebf509968350d6aaec906d7ee355bd31\"",
-            "Size": 472,
-            "StorageClass": "STANDARD"
-        },
-        {
             "Key": "_icons/brands/SEABOARD.jpg",
             "LastModified": "2026-09-16T04:41:32.726000+00:00",
             "ETag": "\"ef02719f4de85f13af21854cc4f03287\"",
@@ -9724,24 +9633,10 @@
             "StorageClass": "STANDARD"
         },
         {
-            "Key": "_icons/brands/SEABOARD.svg",
-            "LastModified": "2026-09-16T04:13:07.365000+00:00",
-            "ETag": "\"e2bf02491f1858768159109eab37182e\"",
-            "Size": 528,
-            "StorageClass": "STANDARD"
-        },
-        {
             "Key": "_icons/brands/SEARA.jpg",
             "LastModified": "2026-09-16T04:41:32.694000+00:00",
             "ETag": "\"13286aae73bb2d8ec927d72118e6ff4e\"",
             "Size": 22055,
-            "StorageClass": "STANDARD"
-        },
-        {
-            "Key": "_icons/brands/SEARA.svg",
-            "LastModified": "2026-09-16T04:13:07.413000+00:00",
-            "ETag": "\"5933ea418d1b75593471d1814d3b9b32\"",
-            "Size": 525,
             "StorageClass": "STANDARD"
         },
         {
@@ -10039,13 +9934,6 @@
             "StorageClass": "STANDARD"
         },
         {
-            "Key": "_icons/species/계육.svg",
-            "LastModified": "2026-09-16T04:13:07.402000+00:00",
-            "ETag": "\"fbaf7f4dcd0ba826a282e8f2caafebbd\"",
-            "Size": 784,
-            "StorageClass": "STANDARD"
-        },
-        {
             "Key": "_icons/species/돈육.jpg",
             "LastModified": "2026-09-16T04:41:32.835000+00:00",
             "ETag": "\"b1cf542fe194b2ac2355353e6b8b8387\"",
@@ -10053,24 +9941,10 @@
             "StorageClass": "STANDARD"
         },
         {
-            "Key": "_icons/species/돈육.svg",
-            "LastModified": "2026-09-16T04:13:07.398000+00:00",
-            "ETag": "\"9af6a8500d167188587aa3f55dd4241e\"",
-            "Size": 899,
-            "StorageClass": "STANDARD"
-        },
-        {
             "Key": "_icons/species/우육.jpg",
             "LastModified": "2026-09-16T04:41:32.715000+00:00",
             "ETag": "\"301354eeeb6ddcae1d98e9fed2dd7243\"",
             "Size": 108654,
-            "StorageClass": "STANDARD"
-        },
-        {
-            "Key": "_icons/species/우육.svg",
-            "LastModified": "2026-09-16T04:13:07.428000+00:00",
-            "ETag": "\"e14ce702eac1833cc7699554f3820d0e\"",
-            "Size": 1060,
             "StorageClass": "STANDARD"
         },
         {
