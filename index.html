@@ -1443,19 +1443,36 @@
     }
   }
 
-  function triggerBlobDownload(blob, url){
+  // iOS Safari는 <a download>를 무시하고 그냥 새 창으로 열어버리는 경우가 많아서
+  // 다운로드가 됐는지 안 됐는지 알기 어렵다. iOS에서는 아예 새 탭으로 열어 공유시트/길게눌러저장을 쓰게 하고,
+  // 그 외 브라우저는 기존처럼 강제 다운로드 + 안내 토스트로 어디에 저장되는지 명확히 알려준다.
+  const isIOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  function saveBlob(blob, filename){
     const blobUrl = URL.createObjectURL(blob);
+    if (isIOS){
+      window.open(blobUrl, '_blank');
+      const isZip = /\.zip$/i.test(filename);
+      showToast(isZip
+        ? '새 탭에서 열렸어요. 저장이 안 되면 공유 버튼으로 "파일에 저장"을 눌러주세요.'
+        : '새 탭에서 열렸어요. 화면을 길게 눌러 "이미지 저장" 또는 공유 버튼으로 저장해주세요.');
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 15000);
+      return;
+    }
     const a = document.createElement('a');
     a.href = blobUrl;
-    const originalName = decodeURIComponent(url.split('/').pop().split('?')[0]);
-    const dot = originalName.lastIndexOf('.');
-    const base = dot > -1 ? originalName.slice(0, dot) : originalName;
-    const extPart = dot > -1 ? originalName.slice(dot) : '';
-    a.download = `${base}_${Date.now()}${extPart}`;
+    a.download = filename;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     setTimeout(() => URL.revokeObjectURL(blobUrl), 3000);
+  }
+
+  function triggerBlobDownload(blob, url){
+    const originalName = decodeURIComponent(url.split('/').pop().split('?')[0]);
+    const dot = originalName.lastIndexOf('.');
+    const base = dot > -1 ? originalName.slice(0, dot) : originalName;
+    const extPart = dot > -1 ? originalName.slice(dot) : '';
+    saveBlob(blob, `${base}_${Date.now()}${extPart}`);
   }
 
   // 단일 사진 다운로드 (버튼 직접 클릭 시 - 실패하면 새 탭으로 폴백)
@@ -1464,6 +1481,7 @@
     try {
       const blob = await fetchAsBlob(url, 1);
       triggerBlobDownload(blob, url);
+      if (!isIOS) showToast('사진 다운로드 완료 (기기의 "다운로드" 폴더 또는 파일 앱에서 확인하세요)');
     } catch(e) {
       console.error('다운로드 실패', e);
       window.open(url, '_blank');
@@ -1509,14 +1527,12 @@
     try {
       const zipBlob = await zip.generateAsync({ type: 'blob' });
       const label = [state.part && (MANIFEST[state.species]?.[state.brand]?.[state.part]?.displayName || state.part), state.bl].filter(Boolean).join('_') || '사진';
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(zipBlob);
-      a.download = `${label}_${targets.length}장.zip`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      setTimeout(() => URL.revokeObjectURL(a.href), 5000);
-      showToast(failedCount === 0 ? `${targets.length}장 zip 다운로드 완료` : `${targets.length - failedCount}장 zip 완료, ${failedCount}장 실패`);
+      saveBlob(zipBlob, `${label}_${targets.length}장.zip`);
+      if (!isIOS){
+        showToast(failedCount === 0
+          ? `${targets.length}장 zip 다운로드 완료 (기기의 "다운로드" 폴더 또는 파일 앱 > 다운로드에서 확인하세요)`
+          : `${targets.length - failedCount}장 zip 완료(${failedCount}장 실패). 기기의 "다운로드" 폴더에서 확인하세요.`);
+      }
     } catch(e) {
       console.error('zip 생성 실패', e);
       showToast('압축 파일 생성에 실패해서 개별 다운로드로 진행합니다');
@@ -1540,7 +1556,7 @@
       await new Promise(r => setTimeout(r, 450));
     }
     if (failed.length === 0){
-      showToast(`${targets.length}장 전부 다운로드 완료`);
+      showToast(isIOS ? `${targets.length}장 전부 처리 완료` : `${targets.length}장 전부 다운로드 완료 (기기의 "다운로드" 폴더에서 확인하세요)`);
     } else {
       showToast(`${targets.length - failed.length}장 성공, ${failed.length}장 실패(${failed.join(',')}번). 실패한 사진은 개별 다운로드 버튼으로 다시 받아주세요.`);
     }
