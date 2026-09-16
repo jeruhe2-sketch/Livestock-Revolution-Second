@@ -9535,6 +9535,13 @@
             "StorageClass": "STANDARD"
         },
         {
+            "Key": "_icons/brands/ACC.jpg",
+            "LastModified": "2026-09-16T05:22:25.220000+00:00",
+            "ETag": "\"b5f8b32fb40eb84754f8a8c9a9b436dc\"",
+            "Size": 25171,
+            "StorageClass": "STANDARD"
+        },
+        {
             "Key": "_icons/brands/ACC.svg",
             "LastModified": "2026-09-16T04:41:32.246000+00:00",
             "ETag": "\"5843ba53dabdd17629eb5bfdc0f85cc2\"",
@@ -9598,6 +9605,13 @@
             "StorageClass": "STANDARD"
         },
         {
+            "Key": "_icons/brands/GATINE.jpg",
+            "LastModified": "2026-09-16T05:22:25.195000+00:00",
+            "ETag": "\"b9b4c21baa498162e8623c63cab0ee2d\"",
+            "Size": 12041,
+            "StorageClass": "STANDARD"
+        },
+        {
             "Key": "_icons/brands/GATINE.svg",
             "LastModified": "2026-09-16T04:41:32.233000+00:00",
             "ETag": "\"fdf5be090f71478db7f551be83d8febe\"",
@@ -9630,6 +9644,13 @@
             "LastModified": "2026-09-16T04:13:06.771000+00:00",
             "ETag": "\"615e04b181ed23505a7ebbb3634387ce\"",
             "Size": 527,
+            "StorageClass": "STANDARD"
+        },
+        {
+            "Key": "_icons/brands/MELTIQUE.jpg",
+            "LastModified": "2026-09-16T05:22:25.308000+00:00",
+            "ETag": "\"73b9358e13b7caf301174311398c4646\"",
+            "Size": 17251,
             "StorageClass": "STANDARD"
         },
         {
