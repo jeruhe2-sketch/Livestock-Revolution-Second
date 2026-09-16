@@ -9556,6 +9556,13 @@
             "StorageClass": "STANDARD"
         },
         {
+            "Key": "_icons/brands/AVINYO.jpg",
+            "LastModified": "2026-09-16T05:17:02.419000+00:00",
+            "ETag": "\"2a218614024ea4a4946d485cf0009dda\"",
+            "Size": 9341,
+            "StorageClass": "STANDARD"
+        },
+        {
             "Key": "_icons/brands/AVINYO.svg",
             "LastModified": "2026-09-16T04:41:32.191000+00:00",
             "ETag": "\"1d09b51adf4a2da4ded0a14cd631895e\"",
@@ -9563,10 +9570,24 @@
             "StorageClass": "STANDARD"
         },
         {
+            "Key": "_icons/brands/BAUCELLS.jpg",
+            "LastModified": "2026-09-16T05:17:01.758000+00:00",
+            "ETag": "\"2232f0752b5bf9a603070b2a1525402a\"",
+            "Size": 9559,
+            "StorageClass": "STANDARD"
+        },
+        {
             "Key": "_icons/brands/BAUCELLS.svg",
             "LastModified": "2026-09-16T04:41:32.437000+00:00",
             "ETag": "\"e3ae06e407b2069707d61b54459a4c59\"",
             "Size": 473,
+            "StorageClass": "STANDARD"
+        },
+        {
+            "Key": "_icons/brands/FRIBIN.jpg",
+            "LastModified": "2026-09-16T05:17:01.721000+00:00",
+            "ETag": "\"779a7cf58b1cbfa16ac1eaed4197a7ea\"",
+            "Size": 13477,
             "StorageClass": "STANDARD"
         },
         {
@@ -9581,6 +9602,13 @@
             "LastModified": "2026-09-16T04:41:32.233000+00:00",
             "ETag": "\"fdf5be090f71478db7f551be83d8febe\"",
             "Size": 471,
+            "StorageClass": "STANDARD"
+        },
+        {
+            "Key": "_icons/brands/MAFRIGES.jpg",
+            "LastModified": "2026-09-16T05:17:01.687000+00:00",
+            "ETag": "\"504c48cebe993502fca7f416ec607abd\"",
+            "Size": 20208,
             "StorageClass": "STANDARD"
         },
         {
@@ -9612,6 +9640,13 @@
             "StorageClass": "STANDARD"
         },
         {
+            "Key": "_icons/brands/NOEL.jpg",
+            "LastModified": "2026-09-16T05:17:02.532000+00:00",
+            "ETag": "\"e5eb18dcd5a39ffc518d78a02ce39863\"",
+            "Size": 19263,
+            "StorageClass": "STANDARD"
+        },
+        {
             "Key": "_icons/brands/NOEL.svg",
             "LastModified": "2026-09-16T04:41:32.282000+00:00",
             "ETag": "\"60c96afa6df235bcb39dd67cb32b9f0d\"",
@@ -9633,10 +9668,24 @@
             "StorageClass": "STANDARD"
         },
         {
+            "Key": "_icons/brands/PATEL.jpg",
+            "LastModified": "2026-09-16T05:17:01.702000+00:00",
+            "ETag": "\"cbef0768745afab83593e514501f0a67\"",
+            "Size": 9418,
+            "StorageClass": "STANDARD"
+        },
+        {
             "Key": "_icons/brands/PATEL.svg",
             "LastModified": "2026-09-16T04:41:32.637000+00:00",
             "ETag": "\"66a18d5ce9d4fac0afeeecd0a05e03fd\"",
             "Size": 470,
+            "StorageClass": "STANDARD"
+        },
+        {
+            "Key": "_icons/brands/RIVASAM.jpg",
+            "LastModified": "2026-09-16T05:17:01.727000+00:00",
+            "ETag": "\"0048cdb69c2d13dc5c3e42f71d7bb0fc\"",
+            "Size": 11357,
             "StorageClass": "STANDARD"
         },
         {
