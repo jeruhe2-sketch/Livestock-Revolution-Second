@@ -25,7 +25,7 @@ def main():
         for fname in files:
             path = os.path.join(root, fname)
             ext = fname.lower().rsplit('.', 1)[-1] if '.' in fname else ''
-            if ext not in ('jpg', 'jpeg', 'png'):
+            if ext not in ('jpg', 'jpeg', 'png', 'webp'):
                 continue
             total += 1
             try:
@@ -48,6 +48,11 @@ def main():
                         changed = True
                     elif img_format == 'PNG' or ext == 'png':
                         img.save(path, 'PNG', optimize=True)
+                        changed = True
+                    elif img_format == 'WEBP' or ext == 'webp':
+                        if img.mode not in ('RGB', 'RGBA'):
+                            img = img.convert('RGB')
+                        img.save(path, 'WEBP', quality=JPEG_QUALITY)
                         changed = True
 
                 new_size_bytes = os.path.getsize(path)

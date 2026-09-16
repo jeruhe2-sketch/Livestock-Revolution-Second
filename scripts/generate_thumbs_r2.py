@@ -25,7 +25,7 @@ def main():
         for fname in files:
             path = os.path.join(root, fname)
             ext = fname.lower().rsplit('.', 1)[-1] if '.' in fname else ''
-            if ext not in ('jpg', 'jpeg', 'png'):
+            if ext not in ('jpg', 'jpeg', 'png', 'webp'):
                 continue
             rel = os.path.relpath(path, local_dir)
             thumb_name = rel.rsplit('.', 1)[0] + '.jpg'  # 썸네일은 전부 jpg로 통일

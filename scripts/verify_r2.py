@@ -21,7 +21,7 @@ def main():
             path = os.path.join(root, fname)
             rel = os.path.relpath(path, local_dir)
             ext = fname.lower().rsplit('.', 1)[-1] if '.' in fname else ''
-            if ext not in ('jpg', 'jpeg', 'png'):
+            if ext not in ('jpg', 'jpeg', 'png', 'webp'):
                 continue
             size = os.path.getsize(path)
             ok = True
