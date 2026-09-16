@@ -4,6 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>축산 라이브러리</title>
+<meta name="description" content="브랜드/부위별 축산물 사진 자료 아카이브 - 돈육·우육·계육 브랜드별 부위 사진, EST/등급/BL 단위로 조회 및 다운로드">
+<meta property="og:type" content="website">
+<meta property="og:title" content="축산 라이브러리">
+<meta property="og:description" content="브랜드/부위별 축산물 사진 자료 아카이브">
+<meta property="og:image" content="https://pub-4a7975ff76ef42ed80c2fcfed0ae169e.r2.dev/_icons/species/%EB%8F%88%EC%9C%A1.jpg">
+<meta property="og:url" content="https://jeruhe2-sketch.github.io/Livestock-Revolution-Second/">
+<meta name="twitter:card" content="summary_large_image">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
 <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="icon" href="icons/favicon-32.png" type="image/png" sizes="32x32">
@@ -1464,11 +1473,59 @@
     }
   }
 
-  // 전체 다운로드 (배치 중엔 새 탭을 띄우지 않고, 끝나고 실패 목록만 안내)
+  // 전체 다운로드 - JSZip으로 한 번에 압축해서 파일 하나로 받게 함 (예전엔 한 장씩 순차 다운로드라 사진 많으면 저장창이 계속 떴었음)
   async function downloadAll(startIdx, count){
     const obj = getObj();
     const start = startIdx || 0;
     const targets = (count === undefined || count === null) ? obj.photos : obj.photos.slice(start, start + count);
+    if (typeof JSZip === 'undefined'){
+      return downloadAllSequential(targets, start);
+    }
+    showToast(`${targets.length}장 압축 중...`);
+    const zip = new JSZip();
+    const usedNames = new Set();
+    let failedCount = 0;
+    for (let j = 0; j < targets.length; j++){
+      try {
+        const blob = await fetchAsBlob(targets[j], 1);
+        let name = decodeURIComponent(targets[j].split('/').pop().split('?')[0]) || `photo_${j+1}.jpg`;
+        if (usedNames.has(name)){
+          const dot = name.lastIndexOf('.');
+          const base = dot > -1 ? name.slice(0, dot) : name;
+          const ext = dot > -1 ? name.slice(dot) : '';
+          name = `${base}_${j+1}${ext}`;
+        }
+        usedNames.add(name);
+        zip.file(name, blob);
+      } catch(e) {
+        console.error('압축용 다운로드 실패', targets[j], e);
+        failedCount++;
+      }
+    }
+    if (usedNames.size === 0){
+      showToast('다운로드할 사진이 없습니다. 개별 다운로드를 시도해주세요.');
+      return;
+    }
+    try {
+      const zipBlob = await zip.generateAsync({ type: 'blob' });
+      const label = [state.part && (MANIFEST[state.species]?.[state.brand]?.[state.part]?.displayName || state.part), state.bl].filter(Boolean).join('_') || '사진';
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(zipBlob);
+      a.download = `${label}_${targets.length}장.zip`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+      showToast(failedCount === 0 ? `${targets.length}장 zip 다운로드 완료` : `${targets.length - failedCount}장 zip 완료, ${failedCount}장 실패`);
+    } catch(e) {
+      console.error('zip 생성 실패', e);
+      showToast('압축 파일 생성에 실패해서 개별 다운로드로 진행합니다');
+      downloadAllSequential(targets, start);
+    }
+  }
+
+  // JSZip을 못 쓸 때(로드 실패 등) 예전 방식(한 장씩 순차 다운로드)으로 폴백
+  async function downloadAllSequential(targets, start){
     showToast(`${targets.length}장 다운로드를 시작합니다`);
     const failed = [];
     for (let j = 0; j < targets.length; j++){
