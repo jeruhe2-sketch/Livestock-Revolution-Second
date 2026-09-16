@@ -16,21 +16,12 @@ if not HOST:
 url = f"https://api.cloudflare.com/client/v4/accounts/{CF_ACCOUNT_ID}/rum/site_info"
 headers = {"Content-Type": "application/json", "Authorization": f"Bearer {CF_API_TOKEN}"}
 
-# 이미 등록돼있는지 먼저 확인 (list)
-list_resp = requests.get(f"{url}?ordering=host", headers=headers, timeout=30)
-list_resp.raise_for_status()
-existing = [s for s in list_resp.json().get("result", []) if any(r.get("host") == HOST for r in s.get("rules", []))]
-
-if existing:
-    print(f"이미 등록된 사이트 발견: {HOST}")
-    site = existing[0]
-else:
-    resp = requests.post(url, headers=headers, json={"host": HOST, "auto_install": False}, timeout=30)
-    if resp.status_code >= 400:
-        print("생성 실패:", resp.status_code, resp.text)
-        sys.exit(1)
-    site = resp.json()["result"]
-    print(f"신규 생성 완료: {HOST}")
+resp = requests.post(url, headers=headers, json={"host": HOST, "auto_install": False}, timeout=30)
+if resp.status_code >= 400:
+    print("생성 실패:", resp.status_code, resp.text)
+    sys.exit(1)
+site = resp.json()["result"]
+print(f"등록 완료: {HOST}")
 
 print("site_tag:", site.get("site_tag"))
 snippet = site.get("snippet", "")
