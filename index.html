@@ -464,6 +464,7 @@
 
 <script>
   let MANIFEST = {};
+  let ICONS = { species:{}, brands:{}, parts:{} };
   const SPECIES_LIST = ['돈육','우육','계육'];
 
   // 원본 URL(예: https://.../r2.dev/AGROSUPER/전지/xxx.png)을
@@ -490,6 +491,7 @@
       sum + Object.values(parts).reduce((s2, part) => s2 + part.photos.length, 0), 0);
   }
   function speciesThumbUrl(sp){
+    if (ICONS.species && ICONS.species[sp]) return ICONS.species[sp];
     const brands = speciesBrands(sp);
     for (const b of Object.keys(brands)){
       for (const p of Object.keys(brands[b])){
@@ -504,6 +506,7 @@
     return Object.values(MANIFEST[sp][b]).reduce((sum, part) => sum + part.photos.length, 0);
   }
   function brandThumbUrl(sp, b){
+    if (ICONS.brands && ICONS.brands[b]) return ICONS.brands[b];
     const parts = MANIFEST[sp][b];
     for (const p of Object.keys(parts)){
       if (parts[p].photos && parts[p].photos.length) return toThumbUrl(parts[p].photos[0]);
@@ -511,6 +514,8 @@
     return '';
   }
   function partThumbUrl(sp, b, p){
+    const partIcon = ICONS.parts && (ICONS.parts[`${sp}|${p}`] || ICONS.parts[p]);
+    if (partIcon) return partIcon;
     const photos = MANIFEST[sp][b][p].photos;
     return (photos && photos.length) ? toThumbUrl(photos[0]) : '';
   }
@@ -536,6 +541,12 @@
     } catch(e) {
       console.error('로드 실패', e);
       MANIFEST = {};
+    }
+    try {
+      ICONS = await fetch('data/icons.json?v=' + Date.now(), { cache: 'no-store' }).then(r => r.json());
+    } catch(e) {
+      console.error('아이콘 로드 실패', e);
+      ICONS = { species:{}, brands:{}, parts:{} };
     }
     applyStateFromHash();
     // 첫 진입 상태를 히스토리 맨 앞에 기록해둔다 (뒤로가기의 최종 종착점)
@@ -683,7 +694,8 @@
       .sort((a, b) => b.count - a.count)
       .map(x => x.v);
   }
-  function optionThumb(obj, batches){
+  function optionThumb(obj, batches, brand){
+    if (brand && ICONS.brands && ICONS.brands[brand]) return ICONS.brands[brand];
     const first = sortByDate(batches)[0];
     return first ? toThumbUrl(obj.photos[first._start]) : '';
   }
@@ -796,7 +808,7 @@
         const matched = allBatches.filter(b => String(b.EST) === est);
         return `
           <div class="select-card" onclick="goEst('${state.species}','${state.brand}','${state.part}','${est}')">
-            ${thumbHtml(optionThumb(obj, matched), `${optionPhotoCount(matched)}장`)}
+            ${thumbHtml(optionThumb(obj, matched, state.brand), `${optionPhotoCount(matched)}장`)}
             <div class="body">
               <div class="name">EST ${est}</div>
               <div class="sub">${obj.displayName}</div>
@@ -823,7 +835,7 @@
         const matched = estFiltered.filter(b => b['등급'] === grade);
         return `
           <div class="select-card" onclick="goGrade('${state.species}','${state.brand}','${state.part}','${state.est||''}','${grade}')">
-            ${thumbHtml(optionThumb(obj, matched), `${optionPhotoCount(matched)}장`)}
+            ${thumbHtml(optionThumb(obj, matched, state.brand), `${optionPhotoCount(matched)}장`)}
             <div class="body">
               <div class="name">등급 ${grade}</div>
               <div class="sub">${state.est ? 'EST ' + state.est : obj.displayName}</div>

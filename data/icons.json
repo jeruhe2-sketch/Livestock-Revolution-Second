@@ -1,0 +1,26 @@
+{
+  "note": "축종/브랜드 대표 아이콘. 브랜드는 자체 제작 배지(임시), 공식 로고 확보되면 같은 키에 URL만 교체하면 됨.",
+  "species": {
+    "돈육": "https://pub-4a7975ff76ef42ed80c2fcfed0ae169e.r2.dev/_icons/species/돈육.svg",
+    "우육": "https://pub-4a7975ff76ef42ed80c2fcfed0ae169e.r2.dev/_icons/species/우육.svg",
+    "계육": "https://pub-4a7975ff76ef42ed80c2fcfed0ae169e.r2.dev/_icons/species/계육.svg"
+  },
+  "brands": {
+    "AGROSUPER": "https://pub-4a7975ff76ef42ed80c2fcfed0ae169e.r2.dev/_icons/brands/AGROSUPER.svg",
+    "SEABOARD": "https://pub-4a7975ff76ef42ed80c2fcfed0ae169e.r2.dev/_icons/brands/SEABOARD.svg",
+    "OLYMEL": "https://pub-4a7975ff76ef42ed80c2fcfed0ae169e.r2.dev/_icons/brands/OLYMEL.svg",
+    "RIVASAM": "https://pub-4a7975ff76ef42ed80c2fcfed0ae169e.r2.dev/_icons/brands/RIVASAM.svg",
+    "PATEL": "https://pub-4a7975ff76ef42ed80c2fcfed0ae169e.r2.dev/_icons/brands/PATEL.svg",
+    "BAUCELLS": "https://pub-4a7975ff76ef42ed80c2fcfed0ae169e.r2.dev/_icons/brands/BAUCELLS.svg",
+    "FRIBIN": "https://pub-4a7975ff76ef42ed80c2fcfed0ae169e.r2.dev/_icons/brands/FRIBIN.svg",
+    "MAFRIGES": "https://pub-4a7975ff76ef42ed80c2fcfed0ae169e.r2.dev/_icons/brands/MAFRIGES.svg",
+    "MARFRIG": "https://pub-4a7975ff76ef42ed80c2fcfed0ae169e.r2.dev/_icons/brands/MARFRIG.svg",
+    "AVINYO": "https://pub-4a7975ff76ef42ed80c2fcfed0ae169e.r2.dev/_icons/brands/AVINYO.svg",
+    "SEARA": "https://pub-4a7975ff76ef42ed80c2fcfed0ae169e.r2.dev/_icons/brands/SEARA.svg",
+    "NOEL": "https://pub-4a7975ff76ef42ed80c2fcfed0ae169e.r2.dev/_icons/brands/NOEL.svg",
+    "GATINE": "https://pub-4a7975ff76ef42ed80c2fcfed0ae169e.r2.dev/_icons/brands/GATINE.svg",
+    "ACC": "https://pub-4a7975ff76ef42ed80c2fcfed0ae169e.r2.dev/_icons/brands/ACC.svg",
+    "MELTIQUE": "https://pub-4a7975ff76ef42ed80c2fcfed0ae169e.r2.dev/_icons/brands/MELTIQUE.svg"
+  },
+  "parts": {}
+}
