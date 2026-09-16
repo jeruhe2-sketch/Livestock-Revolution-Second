@@ -13,6 +13,7 @@ on:
           - list-all       # 버킷 전체 오브젝트 목록을 JSON으로 저장
           - list-folder    # 특정 폴더(prefix) 목록만 저장
           - upload-pending # _pending_upload/ 안의 파일들을 R2에 업로드 후 정리
+          - delete-pending # _pending_delete.json에 나열된 키들을 R2에서 삭제
           - rename-files   # rename-map.json 기준으로 R2 오브젝트 이름 변경(copy+delete)
           - set-cors       # cors-config.json을 버킷에 적용 (브라우저 fetch 다운로드 허용)
           - compress-images # 버킷 전체 사진 리사이즈/재압축 (경로/이름 유지)
@@ -80,6 +81,23 @@ jobs:
             --endpoint-url ${{ secrets.R2_ENDPOINT }} \
             --profile r2 \
             --output json > r2-inventory.json
+
+      - name: _pending_delete.json에 나열된 오브젝트 R2에서 삭제
+        if: ${{ github.event.inputs.action == 'delete-pending' }}
+        run: |
+          if [ -f "_pending_delete.json" ]; then
+            python3 scripts/delete_r2.py
+            rm -f "_pending_delete.json"
+          else
+            echo "삭제 대기 목록(_pending_delete.json) 없음"
+          fi
+          aws s3api list-objects-v2 \
+            --bucket livestock-library \
+            --endpoint-url ${{ secrets.R2_ENDPOINT }} \
+            --profile r2 \
+            --output json > r2-inventory.json
+        env:
+          R2_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
 
       - name: R2 오브젝트 이름 변경 (rename-map.json 기준)
         if: ${{ github.event.inputs.action == 'rename-files' }}
