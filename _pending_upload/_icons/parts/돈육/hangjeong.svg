@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 320">
+<rect width="420" height="320" fill="#FBF8F2"/>
+
+<!-- 몸통 -->
+<ellipse cx="255" cy="200" rx="150" ry="70" fill="#E6E1D6" stroke="#3A342B" stroke-width="2"/>
+<!-- 머리 -->
+<ellipse cx="95" cy="185" rx="58" ry="50" fill="#E6E1D6" stroke="#3A342B" stroke-width="2"/>
+<!-- 주둥이 -->
+<ellipse cx="50" cy="195" rx="20" ry="16" fill="#E6E1D6" stroke="#3A342B" stroke-width="2"/>
+<!-- 귀 -->
+<path d="M78 145 q-14 -26 12 -30 q14 16 4 34z" fill="#E6E1D6" stroke="#3A342B" stroke-width="2"/>
+<!-- 목/어깨 -->
+<path d="M150 155 Q168 140 195 150 L210 230 Q170 235 150 215 Z" fill="#E6E1D6" stroke="#3A342B" stroke-width="2"/>
+<!-- 등심(등쪽 상단 밴드) -->
+<path d="M195 150 Q270 128 350 148 L350 172 Q270 155 200 172 Z" fill="#E6E1D6" stroke="#3A342B" stroke-width="2"/>
+<!-- 갈비(등심 아래, 삼겹 위 옆구리 밴드) -->
+<path d="M200 172 Q270 155 350 172 L350 200 Q270 188 205 200 Z" fill="#E6E1D6" stroke="#3A342B" stroke-width="2"/>
+<!-- 삼겹살(하단 배 밴드) -->
+<path d="M205 200 Q270 188 350 200 L350 232 Q270 248 210 232 Z" fill="#E6E1D6" stroke="#3A342B" stroke-width="2"/>
+<!-- 후지(뒷다리) -->
+<ellipse cx="360" cy="235" rx="35" ry="30" fill="#E6E1D6" stroke="#3A342B" stroke-width="2"/>
+<rect x="345" y="255" width="30" height="35" rx="8" fill="#E6E1D6" stroke="#3A342B" stroke-width="2"/>
+<!-- 전지(앞다리/어깨살) -->
+<ellipse cx="175" cy="220" rx="28" ry="26" fill="#E6E1D6" stroke="#3A342B" stroke-width="2"/>
+<!-- 앞사태 -->
+<rect x="163" y="242" width="22" height="26" rx="6" fill="#E6E1D6" stroke="#3A342B" stroke-width="2"/>
+<!-- 장족 -->
+<rect x="160" y="266" width="26" height="20" rx="5" fill="#E6E1D6" stroke="#3A342B" stroke-width="2"/>
+<!-- 등뼈(등 라인) -->
+<path d="M195 150 Q270 128 350 148" fill="none" stroke="#8B8064" stroke-width="6" stroke-linecap="round"/>
+<!-- 항정살(턱밑) -->
+<ellipse cx="80" cy="222" rx="20" ry="14" fill="#D97C4A" stroke="#3A342B" stroke-width="2"/>
+
+<text x="210" y="305" font-family="Arial, sans-serif" font-size="20" font-weight="800" fill="#3A342B" text-anchor="middle">항정</text>
+</svg>
