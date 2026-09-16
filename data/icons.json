@@ -1,22 +1,22 @@
 {
-  "note": "축종/브랜드/부위 대표 아이콘. 브랜드는 자체 제작 배지(공식 로고 확보되면 URL만 교체), 부위는 정형도 위 해당 구역 강조(정확한 절단선이 아닌 근사 위치 — 재검증 필요시 알려주면 수정).",
+  "note": "species: Wikipedia 실사진(돼지/소/닭). brands: AGROSUPER/SEABOARD/OLYMEL/SEARA/MARFRIG는 Wikipedia에서 확보한 실제 공식 로고, 나머지(RIVASAM/PATEL/BAUCELLS/FRIBIN/MAFRIGES/AVINYO/NOEL/GATINE/ACC/MELTIQUE)는 검색으로 못 찾아서 임시 배지 유지 — 확보되면 교체. parts: 부위별 정형도(구역 강조, 근사치).",
   "species": {
-    "돈육": "https://pub-4a7975ff76ef42ed80c2fcfed0ae169e.r2.dev/_icons/species/돈육.svg",
-    "우육": "https://pub-4a7975ff76ef42ed80c2fcfed0ae169e.r2.dev/_icons/species/우육.svg",
-    "계육": "https://pub-4a7975ff76ef42ed80c2fcfed0ae169e.r2.dev/_icons/species/계육.svg"
+    "돈육": "https://pub-4a7975ff76ef42ed80c2fcfed0ae169e.r2.dev/_icons/species/돈육.jpg",
+    "우육": "https://pub-4a7975ff76ef42ed80c2fcfed0ae169e.r2.dev/_icons/species/우육.jpg",
+    "계육": "https://pub-4a7975ff76ef42ed80c2fcfed0ae169e.r2.dev/_icons/species/계육.jpg"
   },
   "brands": {
-    "AGROSUPER": "https://pub-4a7975ff76ef42ed80c2fcfed0ae169e.r2.dev/_icons/brands/AGROSUPER.svg",
-    "SEABOARD": "https://pub-4a7975ff76ef42ed80c2fcfed0ae169e.r2.dev/_icons/brands/SEABOARD.svg",
-    "OLYMEL": "https://pub-4a7975ff76ef42ed80c2fcfed0ae169e.r2.dev/_icons/brands/OLYMEL.svg",
+    "AGROSUPER": "https://pub-4a7975ff76ef42ed80c2fcfed0ae169e.r2.dev/_icons/brands/AGROSUPER.jpg",
+    "SEABOARD": "https://pub-4a7975ff76ef42ed80c2fcfed0ae169e.r2.dev/_icons/brands/SEABOARD.jpg",
+    "OLYMEL": "https://pub-4a7975ff76ef42ed80c2fcfed0ae169e.r2.dev/_icons/brands/OLYMEL.jpg",
     "RIVASAM": "https://pub-4a7975ff76ef42ed80c2fcfed0ae169e.r2.dev/_icons/brands/RIVASAM.svg",
     "PATEL": "https://pub-4a7975ff76ef42ed80c2fcfed0ae169e.r2.dev/_icons/brands/PATEL.svg",
     "BAUCELLS": "https://pub-4a7975ff76ef42ed80c2fcfed0ae169e.r2.dev/_icons/brands/BAUCELLS.svg",
     "FRIBIN": "https://pub-4a7975ff76ef42ed80c2fcfed0ae169e.r2.dev/_icons/brands/FRIBIN.svg",
     "MAFRIGES": "https://pub-4a7975ff76ef42ed80c2fcfed0ae169e.r2.dev/_icons/brands/MAFRIGES.svg",
-    "MARFRIG": "https://pub-4a7975ff76ef42ed80c2fcfed0ae169e.r2.dev/_icons/brands/MARFRIG.svg",
+    "MARFRIG": "https://pub-4a7975ff76ef42ed80c2fcfed0ae169e.r2.dev/_icons/brands/MARFRIG.jpg",
     "AVINYO": "https://pub-4a7975ff76ef42ed80c2fcfed0ae169e.r2.dev/_icons/brands/AVINYO.svg",
-    "SEARA": "https://pub-4a7975ff76ef42ed80c2fcfed0ae169e.r2.dev/_icons/brands/SEARA.svg",
+    "SEARA": "https://pub-4a7975ff76ef42ed80c2fcfed0ae169e.r2.dev/_icons/brands/SEARA.jpg",
     "NOEL": "https://pub-4a7975ff76ef42ed80c2fcfed0ae169e.r2.dev/_icons/brands/NOEL.svg",
     "GATINE": "https://pub-4a7975ff76ef42ed80c2fcfed0ae169e.r2.dev/_icons/brands/GATINE.svg",
     "ACC": "https://pub-4a7975ff76ef42ed80c2fcfed0ae169e.r2.dev/_icons/brands/ACC.svg",
