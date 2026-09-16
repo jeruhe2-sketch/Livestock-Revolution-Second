@@ -17,6 +17,7 @@ on:
           - rename-files   # rename-map.json 기준으로 R2 오브젝트 이름 변경(copy+delete)
           - set-cors       # cors-config.json을 버킷에 적용 (브라우저 fetch 다운로드 허용)
           - compress-images # 버킷 전체 사진 리사이즈/재압축 (경로/이름 유지)
+          - setup-analytics # Cloudflare Web Analytics 사이트 등록 (jeruhe2-sketch.github.io 방문자 통계)
           - fix-orientation # EXIF 회전 정보가 있는 사진을 실제 픽셀 회전으로 반영(눕거나 뒤집힌 채 뜨는 문제 해결)
           - verify-images  # 버킷 전체 사진이 정상적으로 열리는지 무결성 검증
           - generate-thumbs # 그리드 표시용 작은 썸네일(400px) 생성해서 thumbs/ 에 업로드
@@ -140,6 +141,23 @@ jobs:
           echo "테스트 URL: $TESTURL" >> cors-result.json
           curl -s -I -H "Origin: https://jeruhe2-sketch.github.io" "$TESTURL" >> cors-result.json
           cat cors-result.json
+
+      - name: Cloudflare Web Analytics 사이트 등록
+        if: ${{ github.event.inputs.action == 'setup-analytics' }}
+        run: |
+          pip install requests --quiet
+          python3 scripts/setup_cf_analytics.py "jeruhe2-sketch.github.io"
+        env:
+          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+
+      - name: 분석 스니펫을 아티팩트로 업로드
+        if: ${{ github.event.inputs.action == 'setup-analytics' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: cf-analytics-snippet
+          path: cf_analytics_snippet_*.html
+          retention-days: 7
 
       - name: Pillow 설치
         if: ${{ github.event.inputs.action == 'compress-images' || github.event.inputs.action == 'verify-images' || github.event.inputs.action == 'generate-thumbs' || github.event.inputs.action == 'fix-orientation' }}
