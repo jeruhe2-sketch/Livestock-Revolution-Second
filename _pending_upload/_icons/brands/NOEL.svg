@@ -1,6 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 180">
-<rect width="300" height="180" fill="#FAF8F3"/>
-<rect x="0" y="0" width="300" height="180" fill="none" stroke="#E4DFD3" stroke-width="2"/>
-<line x1="40" y1="130" x2="260" y2="130" stroke="#2E5960" stroke-width="3" opacity="0.5"/>
-<text x="150" y="100" font-family="Georgia, 'Times New Roman', serif" font-size="30" font-weight="700" fill="#2E5960" text-anchor="middle" letter-spacing="1">NOEL</text>
-</svg>
