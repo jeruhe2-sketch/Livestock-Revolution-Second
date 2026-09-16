@@ -17,6 +17,7 @@ on:
           - rename-files   # rename-map.json 기준으로 R2 오브젝트 이름 변경(copy+delete)
           - set-cors       # cors-config.json을 버킷에 적용 (브라우저 fetch 다운로드 허용)
           - compress-images # 버킷 전체 사진 리사이즈/재압축 (경로/이름 유지)
+          - fix-orientation # EXIF 회전 정보가 있는 사진을 실제 픽셀 회전으로 반영(눕거나 뒤집힌 채 뜨는 문제 해결)
           - verify-images  # 버킷 전체 사진이 정상적으로 열리는지 무결성 검증
           - generate-thumbs # 그리드 표시용 작은 썸네일(400px) 생성해서 thumbs/ 에 업로드
         default: list-all
@@ -141,8 +142,20 @@ jobs:
           cat cors-result.json
 
       - name: Pillow 설치
-        if: ${{ github.event.inputs.action == 'compress-images' || github.event.inputs.action == 'verify-images' || github.event.inputs.action == 'generate-thumbs' }}
+        if: ${{ github.event.inputs.action == 'compress-images' || github.event.inputs.action == 'verify-images' || github.event.inputs.action == 'generate-thumbs' || github.event.inputs.action == 'fix-orientation' }}
         run: pip install Pillow --quiet
+
+      - name: EXIF 회전 정보 픽셀 반영 (사진 눕힘/뒤집힘 보정)
+        if: ${{ github.event.inputs.action == 'fix-orientation' }}
+        run: |
+          python3 scripts/fix_orientation_r2.py
+          aws s3api list-objects-v2 \
+            --bucket livestock-library \
+            --endpoint-url ${{ secrets.R2_ENDPOINT }} \
+            --profile r2 \
+            --output json > r2-inventory.json
+        env:
+          R2_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
 
       - name: 버킷 이미지 전체 무결성 검증
         if: ${{ github.event.inputs.action == 'verify-images' }}

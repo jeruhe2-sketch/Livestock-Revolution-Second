@@ -308,6 +308,8 @@
     touch-action: none;
     will-change: transform;
   }
+  /* 90도/270도 회전 시 화면에 꽉 차게 가로/세로 한도를 서로 바꿔준다 */
+  .lightbox-stage img.rot90{ max-width: 82vh; max-height: 94vw; }
   .lightbox-close{
     position:absolute; top:max(14px, env(safe-area-inset-top)); right:14px;
     width:44px; height:44px; border-radius:50%;
@@ -337,6 +339,15 @@
   .lightbox-download:hover{ background: var(--accent); }
   .lightbox-download.loading svg{ animation: spin .8s linear infinite; }
   @keyframes spin{ to{ transform: rotate(360deg); } }
+  .lightbox-rotate{
+    position:absolute; bottom:max(14px, env(safe-area-inset-bottom)); left:14px;
+    width:44px; height:44px; border-radius:50%;
+    background: rgba(255,255,255,0.12); border:none;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer; color:#fff;
+    z-index: 2;
+  }
+  .lightbox-rotate:hover{ background: var(--accent); }
 
   /* 좌우 넘기기 버튼 (지마켓 상품 이미지처럼: 스크롤/드래그 대신 버튼으로 넘김)
      모바일은 원래 터치 스와이프로 넘기므로, 버튼은 마우스/트랙패드가 있는 웹 환경에서만 노출 */
@@ -455,6 +466,9 @@
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.4"><path d="M9 6l6 6-6 6"/></svg>
   </button>
   <div class="lightbox-counter" id="lightbox-counter"></div>
+  <button class="lightbox-rotate" id="lightbox-rotate-btn" onclick="event.stopPropagation(); rotateLightbox()" title="회전">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2"><path d="M3 12a9 9 0 1 1 3.5 7.1"/><path d="M3 4v6h6"/></svg>
+  </button>
   <button class="lightbox-download" id="lightbox-dl-btn" onclick="lightboxDownload(event)" title="다운로드">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2"><path d="M12 3v12"/><path d="M6 11l6 6 6-6"/><path d="M5 21h14"/></svg>
   </button>
@@ -999,8 +1013,9 @@
     lightboxIndex = idx;
     const img = document.getElementById('lightbox-img');
     img.src = photos[idx];
-    img.dataset.scale = 1; img.dataset.tx = 0; img.dataset.ty = 0;
-    img.style.transform = 'translate(0px, 0px) scale(1)';
+    img.dataset.scale = 1; img.dataset.tx = 0; img.dataset.ty = 0; img.dataset.rotate = 0;
+    img.style.transform = 'translate(0px, 0px) scale(1) rotate(0deg)';
+    img.classList.remove('rot90');
     img.style.touchAction = 'none';
     updateLightboxCounter();
     updateNavButtons();
@@ -1022,6 +1037,16 @@
     const photos = getObj().photos;
     document.getElementById('lightbox-prev-btn').classList.toggle('disabled', lightboxIndex <= 0);
     document.getElementById('lightbox-next-btn').classList.toggle('disabled', lightboxIndex >= photos.length - 1);
+  }
+
+  // 사진이 옆으로 눕거나 뒤집혀 있을 때 수동으로 90도씩 돌려서 바로잡는 버튼
+  function rotateLightbox(){
+    const img = document.getElementById('lightbox-img');
+    const cur = ((parseInt(img.dataset.rotate || 0, 10) % 360) + 360) % 360;
+    const next = (cur + 90) % 360;
+    img.dataset.rotate = next;
+    img.classList.toggle('rot90', next === 90 || next === 270);
+    img.style.transform = `translate(${img.dataset.tx}px, ${img.dataset.ty}px) scale(${img.dataset.scale}) rotate(${next}deg)`;
   }
 
   function closeLightbox(){
@@ -1054,7 +1079,8 @@
       return Math.hypot(a.x-b.x, a.y-b.y);
     }
     function applyTransform(img){
-      img.style.transform = `translate(${img.dataset.tx}px, ${img.dataset.ty}px) scale(${img.dataset.scale})`;
+      const rotate = img.dataset.rotate || 0;
+      img.style.transform = `translate(${img.dataset.tx}px, ${img.dataset.ty}px) scale(${img.dataset.scale}) rotate(${rotate}deg)`;
     }
     function clampPan(img, scale){
       const rect = img.getBoundingClientRect();
