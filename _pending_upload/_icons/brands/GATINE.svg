@@ -1,6 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
-<rect width="200" height="200" rx="20" fill="#8C6A3F"/>
-<rect x="10" y="10" width="180" height="180" rx="14" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="2"/>
-<text x="100" y="112" font-family="Arial, sans-serif" font-size="52" font-weight="800" fill="#FFFFFF" text-anchor="middle">GA</text>
-<text x="100" y="150" font-family="Arial, sans-serif" font-size="15" font-weight="600" fill="rgba(255,255,255,0.85)" text-anchor="middle">GATINE</text>
-</svg>
