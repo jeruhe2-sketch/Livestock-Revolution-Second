@@ -1,0 +1,14 @@
+{
+  "last_processed_message_id": "1a0ae11fcf04e4fc",
+  "alerts": [
+    {
+      "message_id": "1a0ae11fcf04e4fc",
+      "received_at": "Thu, 17 Sep 2026 06:33:28 +0000",
+      "subject": "WOAH distribution list: Confirmar suscripción",
+      "matched_country": null,
+      "disease": "기타",
+      "urgent": false
+    }
+  ],
+  "updated_at": "2026-09-17T08:01:26.936269+00:00"
+}
