@@ -30,8 +30,10 @@ from googleapiclient.discovery import build
 
 OUTPUT_PATH = "data/asf_alerts.json"
 
-# WOAH 발신 주소 (실제 수신 메일 확인 후 정확한 주소로 교체 필요)
-WOAH_SENDER_QUERY = "from:(woah.org OR oie.int)"
+# WOAH 발신 주소
+# - woah-info-web@woah.org : WAHIS Distribution List (즉시통보, 실시간) - 이게 진짜 타깃
+# - bulletin@woah.org      : 월간 뉴스레터 (실시간 아님) - 제외
+WOAH_SENDER_QUERY = "from:woah-info-web@woah.org"
 
 # 회사가 실제 거래 중인 원산지 - 겹치면 긴급 플래그
 WATCH_COUNTRIES = {
