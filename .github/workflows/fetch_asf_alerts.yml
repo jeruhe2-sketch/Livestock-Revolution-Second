@@ -37,4 +37,5 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add data/asf_alerts.json
           git diff --quiet --cached || git commit -m "chore: ASF 이메일 알림 갱신 [자동]"
+          git pull --rebase origin main
           git push
