@@ -2,67 +2,63 @@
   "last_processed_message_id": "1a0b50d4577674a3",
   "alerts": [
     {
-      "message_id": "1a0b50d4577674a3",
-      "received_at": "Fri, 18 Sep 2026 15:05:27 +0000",
-      "subject": "EGY - Simulation exercise / Exercice de simulation / Ejercicio de simulacro",
-      "matched_country": null,
-      "disease": "기타",
-      "urgent": false
-    },
-    {
-      "message_id": "1a0b505fa79365c7",
-      "received_at": "Fri, 18 Sep 2026 14:57:32 +0000",
-      "subject": "EGY - Simulation exercise / Exercice de simulation / Ejercicio de simulacro",
-      "matched_country": null,
-      "disease": "기타",
-      "urgent": false
-    },
-    {
       "message_id": "1a0b4e12fefa6893",
       "received_at": "Fri, 18 Sep 2026 14:17:20 +0000",
       "subject": "DEU 18/09/26 — West Nile Fever / Fièvre de West Nile / Fiebre del Nilo Occidental",
+      "country_code": "DEU",
+      "country_kr": "독일",
+      "report_date": "18/09/26",
+      "disease_en": "West Nile Fever",
+      "disease_kr": "웨스트나일열",
       "matched_country": null,
-      "disease": "기타",
       "urgent": false
     },
     {
       "message_id": "1a0b4df443acc066",
       "received_at": "Fri, 18 Sep 2026 14:15:12 +0000",
       "subject": "ARG 18/09/26  — High. pathogenic influenza A, non-poultry/Influenza A hautement pathogène, non volailles/Infl. A altamente patógena, aves no de corral",
+      "country_code": "ARG",
+      "country_kr": "아르헨티나",
+      "report_date": "18/09/26",
+      "disease_en": "High. pathogenic influenza A, non-poultry",
+      "disease_kr": "고병원성 인플루엔자 A(비가금)",
       "matched_country": null,
-      "disease": "기타",
       "urgent": false
     },
     {
       "message_id": "1a0b48491391a8c9",
       "received_at": "Fri, 18 Sep 2026 12:36:08 +0000",
       "subject": "CYP 18/09/26 — West Nile Fever / Fièvre de West Nile / Fiebre del Nilo Occidental",
+      "country_code": "CYP",
+      "country_kr": "키프로스",
+      "report_date": "18/09/26",
+      "disease_en": "West Nile Fever",
+      "disease_kr": "웨스트나일열",
       "matched_country": null,
-      "disease": "기타",
       "urgent": false
     },
     {
       "message_id": "1a0b39d35d851739",
       "received_at": "Fri, 18 Sep 2026 08:23:27 +0000",
       "subject": "DEU 18/09/26 — West Nile Fever / Fièvre de West Nile / Fiebre del Nilo Occidental",
+      "country_code": "DEU",
+      "country_kr": "독일",
+      "report_date": "18/09/26",
+      "disease_en": "West Nile Fever",
+      "disease_kr": "웨스트나일열",
       "matched_country": null,
-      "disease": "기타",
       "urgent": false
     },
     {
       "message_id": "1a0b39ae15a332a5",
       "received_at": "Fri, 18 Sep 2026 08:20:54 +0000",
       "subject": "SSD 18/09/26 — African swine fever / Peste porcine africaine / Peste porcina africana",
+      "country_code": "SSD",
+      "country_kr": "남수단",
+      "report_date": "18/09/26",
+      "disease_en": "African swine fever",
+      "disease_kr": "아프리카돼지열병",
       "matched_country": null,
-      "disease": "ASF",
-      "urgent": false
-    },
-    {
-      "message_id": "1a0ae11fcf04e4fc",
-      "received_at": "Thu, 17 Sep 2026 06:33:28 +0000",
-      "subject": "WOAH distribution list: Confirmar suscripción",
-      "matched_country": null,
-      "disease": "기타",
       "urgent": false
     }
   ],
